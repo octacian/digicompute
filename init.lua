@@ -1,275 +1,197 @@
+-- digiterm/init.lua
 
---a function for producing a digiterm form with specified output and input
+-- digiterm formspec
 local function digiterm_formspec(output, input)
 	return 'size[10,11] textarea[.25,.25;10,10.5;output;;'..output..'] button[0,9.5;10,1;update;update] field[.25,10.75;9,1;input;;'..input..'] button[9,10.5;1,1;submit;submit]'
 end
 
---extremely hacky
---but neccessary since there doesn't seem to be any better way to refresh a formspec
+-- refresh formspec
 local function hacky_quote_new_digiterm_formspec(startspace)
 	return (startspace and ' ' or '')..digiterm_formspec('${output}', '${input}');
 end
 
---a basic digiterm!
-minetest.register_node('digiterm:digiterm', {
-	description = 'digiterm',
-	
-	--set graphics
+-- basic digiterm
+minetest.register_node('digiterm:basic', {
+	description = "digiterm",
 	tiles = {'digiterm_side.png', 'digiterm_side.png', 'digiterm_side.png', 'digiterm_side.png', 'digiterm_side.png', 'digiterm_front.png'},
 	paramtype2 = 'facedir',
-	
-	--it's kind of stone-like
 	groups = {cracky = 2},
 	sounds = default.node_sound_stone_defaults(),
-	
-	--digiline stuff (mostly based on other digiline things as suggested)
+	-- digiline registers
 	digiline = {
 		receptor = {},
 		effector = {
 			action = function(pos, node, channel, msg)
 				local meta = minetest.get_meta(pos);
-				
 				--ignore anything that isn't our channel
 				if channel ~= meta:get_string('channel') then return end
-				
 				--if it's a string, append to the end of our output string
 				if type(msg) == 'string' then meta:set_string('output', meta:get_string('output')..msg);
-				
 				--it may also be a control code; check if it's a table with a 'code' member
 				elseif type(msg) == 'table' and msg.code then
-					
 					--the code 'cls' clears out the output
-					if msg.code == 'cls' then meta:set_string('output', ''); end
+					if msg.code == "clear" then meta:set_string('output', ''); end
 				end
 			end
 		},
 	},
-	
-	on_construct = function(pos)
-		local meta = minetest.get_meta(pos);
-		
-		--initialize the input and output buffers
+	on_construct = function(pos) -- set default meta/formspec
+		local meta = minetest.get_meta(pos); -- get meta
+		-- initialize the input and output buffers
 		meta:set_string('output', '');
 		meta:set_string('input', '');
-		
-		--set an initial formspec for specifying the channel
+		-- initial channel specification formspec
 		meta:set_string('formspec', 'field[channel;channel;${channel}]');
-		
-		--start on an empty channel
+		-- init on blank channel
 		meta:set_string('channel', '');
 	end,
-	
-	on_receive_fields = function(pos, formname, fields, sender)
+	on_receive_fields = function(pos, formname, fields, sender) -- when fields recieved
 		local meta = minetest.get_meta(pos);
-		
-		--are we to set the channel?
+		-- if channel provided, set it
 		if fields.channel then
-			
-			--if so, set it
-			meta:set_string('channel', fields.channel);
-			
-			--replace with the operating formspec
+			meta:set_string("channel", fields.channel);
+			-- replace with operating formspec
 			meta:set_string('formspec', hacky_quote_new_digiterm_formspec(false));
-			
-			--and disregard the rest of this callback
-			return;
-			
+			return; -- end callback
 		end
-		
-		--has the user touched the submit button?
+		-- if submit pressed, reset and send
 		if fields.submit then
-			
-			--if so, submit and reset the input field
-			digiline:receptor_send(pos, digiline.rules.default, meta:get_string('channel'), fields.input);
-			meta:set_string('input', '');
-		else
-			
-			--otherwise, update the input so that it doesn't change
-			meta:set_string('input', fields.input);
+			digiline:receptor_send(pos, digiline.rules.default, meta:get_string('channel'), fields.input); -- send via digilines
+			meta:set_string('input', ''); -- reset
+		else -- don't reset input
+			meta:set_string('input', fields.input); -- keep input
 		end
-		
-		--refresh the formspec hackishly
+		-- refresh formspec
 		meta:set_string('formspec', hacky_quote_new_digiterm_formspec(meta:get_string('formspec'):sub(0, 1) ~= ' '));
 	end,
 });
 
---add a craft recipe for digiterms
-minetest.register_craft({
-	output = 'digiterm:digiterm',
-	recipe = {
-		{'default:glass', 'default:glass', 'default:glass'},
-		{'digilines:wire_std_00000000', 'mesecons_luacontroller:luacontroller0000', 'digilines:wire_std_00000000'},
-		{'default:stone', 'default:steel_ingot', 'default:stone'},
-	},
-});
-
---creation and usage of node positions encoded into formspec names
+-- creation and usage of node positions encoded into formspec names
 local function make_secure_digiterm_formspec_name(pos)
 	return 'digitermspec{x='..tostring(pos.x)..',y='..tostring(pos.y)..',z='..tostring(pos.z)..'}';
 end
 local function retrieve_secure_digiterm_pos(formname)
-	
+
 	--try to pull the vector out of the form name
 	local possstr;
 	posstr = formname:match('^digitermspec({x=%-?%d*%.?%d*,y=%-?%d*%.?%d*,z=%-?%d*%.?%d*})$');
-	
+
 	--if we didn't get one, give up
 	if not posstr then return; end
-	
+
 	--otherwise, grab the position
 	return loadstring('return '..posstr)();
 end
 
---a secure digiterm!
-minetest.register_node('digiterm:digiterm_secure', {
+-- secure digiterm
+minetest.register_node('digiterm:secure', {
 	description = 'secure digiterm',
-	
-	--set graphics
 	tiles = {'digiterm_side.png', 'digiterm_side.png', 'digiterm_side.png', 'digiterm_side.png', 'digiterm_side.png', 'digiterm_secure_front.png'},
 	paramtype2 = 'facedir',
-	
-	--it's kind of stone-like
 	groups = {cracky = 2},
 	sounds = default.node_sound_stone_defaults(),
-	
-	--digiline stuff (mostly based on other digiline things as suggested)
+	-- digiline register
 	digiline = {
 		receptor = {},
 		effector = {
 			action = function(pos, node, channel, msg)
-				local meta = minetest.get_meta(pos);
-				
-				--ignore anything that isn't our channel
+				local meta = minetest.get_meta(pos); -- get meta
+				-- ignore signal if incorrect channel
 				if channel ~= meta:get_string('channel') then return end
-				
-				--try to find some id
-				local player;
+				-- get player name
 				if type(msg) == 'table' and msg.player then
-					
-					--attempt to grab the player name if it's a string
-					player = msg.player == 'string' and msg.player;
-					
-					--if the id is passed correctly and the field msg exists, than that's the actual msg
-					msg = msg.msg or msg;
+					local player = msg.player == 'string' and msg.player; -- get player name as string
+					msg = msg.msg or msg; -- set msg
 				end
-				
-				--otherwise, assume the last encountered player is the target of the message
+				-- if player was not determined, use last player
 				if not player then player = meta:get_string('last_player'); end
-				
-				--if there is no such player, give up
+				-- if player still blank, return and end
 				if not player then return; end
-				
-				--if the player in question doesn't have a session here, give up
+				-- if player has no session, return and end
 				if not meta:get_int(player..'_seq') then return; end
-				
-				--for strings, append at the end of the player's output
+				-- if msg is string, append to end of player name
 				if type(msg) == 'string' then meta:set_string(player..'_output', meta:get_string(player..'_output')..msg);
-				
-				--handle control codes too
-				elseif type(msg) == 'table' and msg.code then
-					
-					--the code 'cls' clears out the output
+				elseif type(msg) == 'table' and msg.code then -- handle control codes
+					-- the code 'cls' clears out the output
 					if msg.code == 'cls' then meta:set_string(player..'_output', ''); end
 				end
 			end
 		},
 	},
-	
-	on_construct = function(pos)
-		local meta = minetest.get_meta(pos);
-		
-		--set an initial formspec for specifying the channel
+	on_construct = function(pos) -- set default meta/formspec
+		local meta = minetest.get_meta(pos); -- get meta
+		-- initialize the input and output buffers
+		meta:set_string('output', '');
+		meta:set_string('input', '');
+		-- initial channel specification formspec
 		meta:set_string('formspec', 'field[channel;channel;${channel}]');
-		
-		--start on an empty channel
+		-- init on blank channel
 		meta:set_string('channel', '');
 	end,
-	
 	on_receive_fields = function(pos, formname, fields, sender)
-		local meta = minetest.get_meta(pos);
-		
-		--are we to set the channel?
+		local meta = minetest.get_meta(pos); -- get meta
+		-- if channel provided, set it
 		if fields.channel then
-			
-			--if so, set it
-			meta:set_string('channel', fields.channel);
-			
-			--and dump the formspec
-			meta:set_string('formspec', '');
+			meta:set_string('channel', fields.channel); -- set channel
+			meta:set_string('formspec', ''); -- remove formspec
 		end
 	end,
-	
-	on_rightclick = function(pos, node, player, itemstack)
-		local meta = minetest.get_meta(pos);
-		
-		--grab the player's name
-		local name = player:get_player_name();
-		
-		--log this person as the last visitor
-		meta:set_string('last_player', name);
-		
-		--grab the input, output, and current message sequence number for this player
+	on_rightclick = function(pos, node, player, itemstack) -- on rightclick
+		local meta = minetest.get_meta(pos); -- get meta
+		local name = player:get_player_name(); -- get player name
+		meta:set_string('last_player', name); -- log as last visitor
+		-- get the input, output, and current message sequence number for this player
 		local output, input, seq = meta:get_string(name..'_output'), meta:get_string(name..'_input'), meta:get_int(name..'_seq');
-		
-		--if any are nil, re-initialize all
+		-- re-initialize nil values
 		if not output or not input or not seq then
 			output, input, seq = '', '', 0;
 			meta:set_string(name..'_output', output);
 			meta:set_string(name..'_input', input);
 			meta:set_int(name..'_seq', seq);
 		end
-		
-		--send a message to let the network so that it can send a greeting
+		-- send message to network
 		digiline:receptor_send(pos, digiline.rules.default, meta:get_string('channel'), function() return {player=name, seq=seq, code='init'} end);
-		
-		--bump the sequence number
-		meta:set_int(name..'_seq', seq + 1);
-		
-		--show them the formspec
-		minetest.show_formspec(name, make_secure_digiterm_formspec_name(pos), digiterm_formspec(output, input));
-		
-		--we don't need to do anything with itemstack
+		meta:set_int(name..'_seq', seq + 1); -- bump sequence number
+		minetest.show_formspec(name, make_secure_digiterm_formspec_name(pos), digiterm_formspec(output, input)); -- show formspec
 		return itemstack;
 	end,
 });
 
---we need to register something to pick up our formspec submissions
+-- pick up formspec submissions
 minetest.register_on_player_receive_fields(function (player, formname, fields)
-	
-	--we shall attempt to obtain the node coordinates from the formname
+	-- attempt to obtain coordinates from formname
 	local pos = retrieve_secure_digiterm_pos(formname);
-	
-	--if that failed, then we pass execution on
+	-- if that failed, ignore
 	if not pos then return false; end
-	
-	--otherwise, grab some metadata and the player name
+	-- get metadata and player name
 	local meta = minetest.get_meta(pos);
 	local name = player:get_player_name();
-	
-	--has the user touched the submit button?
+	-- if submit, send msg and resut input
 	if fields.submit then
-		
-		--if so, submit and reset the input field
 		local seq = meta:get_int(name..'_seq');
 		digiline:receptor_send(pos, digiline.rules.default, meta:get_string('channel'), function() return {player=name, seq=seq, msg=fields.input} end);
 		meta:set_string(name..'_input', '');
-		
-		--and bump the sequence number
-		meta:set_int(name..'_seq', seq + 1);
-	else
-		
-		--otherwise, update the input so that it doesn't change
+		meta:set_int(name..'_seq', seq + 1); -- bump the sequence number
+	else -- else, don't change input
 		meta:set_string(name..'_input', fields.input);
 	end
-	
-	--re-show the formspec
+	-- refresh formspec
 	minetest.show_formspec(name, make_secure_digiterm_formspec_name(pos), digiterm_formspec(meta:get_string(name..'_output'), meta:get_string(name..'_input')));
-	
 end);
 
---add a craft recipe for the secure variant
+-- [recipe] basic digiterm
 minetest.register_craft({
-	output = 'digiterm:digiterm_secure',
+	output = "digiterm:basic",
+	recipe = {
+		{'default:glass', 'default:glass', 'default:glass'},
+		{'digilines:wire_std_00000000', 'mesecons_luacontroller:luacontroller0000', 'digilines:wire_std_00000000'},
+		{'default:stone', 'default:steel_ingot', 'default:stone'},
+	},
+})
+
+-- [recipe] secure digiterm
+minetest.register_craft({
+	output = "digiterm:secure",
 	recipe = {
 		{'', 'default:steel_ingot', ''},
 		{'default:steel_ingot', 'digiterm:digiterm', 'default:steel_ingot'},
