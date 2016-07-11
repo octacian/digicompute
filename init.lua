@@ -1,5 +1,10 @@
 -- digiterm/init.lua
+digiterm = {}
+local modpath = minetest.get_modpath("digiterm")
+dofile(modpath.."/api.lua")
+dofile(modpath.."/nodes.lua")
 
+--[[
 -- digiterm formspec
 local function digiterm_formspec(output, input)
 	return 'size[10,11] textarea[.25,.25;10,10.5;output;;'..output..'] button[0,9.5;10,1;update;update] field[.25,10.75;9,1;input;;'..input..'] button[9,10.5;1,1;submit;submit]'
@@ -197,4 +202,4 @@ minetest.register_craft({
 		{'default:steel_ingot', 'digiterm:digiterm', 'default:steel_ingot'},
 		{'', 'default:steel_ingot', ''},
 	},
-});
+});]]--
