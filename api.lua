@@ -47,11 +47,11 @@ function digiterm.register_terminal(termstring, desc)
       receptor = {},
       effector = {
         action = function(pos, node, channel, msg)
-          local meta = minetest.get_meta(pos) -- get meta =
+          local meta = minetest.get_meta(pos) -- get meta
           -- if channel is correct, turn on
           if channel == meta:get_string("channel") then
             if msg.system == "on" then
-              digiterm.on(pos)
+              digiterm.on(pos, termstring)
             end
           end
         end
