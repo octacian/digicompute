@@ -1,39 +1,37 @@
 -- digiterm/api.lua
 
 -- FORMSPECS
-digiterm.formspec = {}
 -- normal
-function digiterm.formspec.normal(output, input)
+function digiterm.formspec_normal(output, input)
   return 'size[10,11] textarea[.25,.25;10,10.5;output;;'..output..'] button[0,9.5;10,1;update;update] field[.25,10.75;9,1;input;;'..input..'] button[9,10.5;1,1;submit;submit]'
 end
 -- refresh
-function digiterm.formspec.operating(startspace)
-  return (startspace and ' ' or '')..digiterm.formspec.normal('${output}', '${input}');
+function digiterm.formspec_operating(startspace)
+  return (startspace and ' ' or '')..digiterm.formspec_normal('${output}', '${input}');
 end
 -- /FORMSPECS
 
 -- SYSTEM FUNCTIONS
-digiterm.system = {}
 -- turn on (not functional)
-function digiterm.system.on(pos, node)
+function digiterm.on(pos, node)
   minetest.swap_node({x = pos.x, y = pos.y, z = pos.z}, {name = "digiterm:"..node.."_bios"}) -- set node to bios
   minetest.after(3.5, function(pos_)
     minetest.swap_node({x = pos_.x, y = pos_.y, z = pos_.z}, {name = "digiterm:"..node.."_on"}) -- set node to on after 5 seconds
   end, vector.new(pos))
   local meta = minetest.get_meta(pos) -- get meta
-  meta:set_string("formspec", digiterm.formspec.operating(true))
+  meta:set_string("formspec", digiterm.formspec_operating(true))
 end
 -- turn off
-function digiterm.system.off(pos, termstring)
+function digiterm.off(pos, termstring)
   local meta = minetest.get_meta(pos) -- get meta
   meta:set_string("formspec", "") -- clear formspec
   meta = nil -- clear meta variable
   minetest.swap_node(pos, "digiterm:"..termstring) -- set node to off
 end
 -- reboot
-function digiterm.system.reboot(pos, termstring)
-  digiterm.system.off(pos, termstring)
-  digiterm.system.on(pos, termstring)
+function digiterm.reboot(pos, termstring)
+  digiterm.off(pos, termstring)
+  digiterm.on(pos, termstring)
 end
 -- /SYSTEM FUNCTIONS
 
@@ -53,14 +51,14 @@ function digiterm.register_terminal(termstring, desc)
           -- if channel is correct, turn on
           if channel == meta:get_string("channel") then
             if msg.system == "on" then
-              digiterm.system.on(pos)
+              digiterm.on(pos)
             end
           end
         end
       },
     },
     on_rightclick = function(pos)
-      digiterm.system.on(pos, termstring)
+      digiterm.on(pos, termstring)
     end,
   })
   -- bios
@@ -103,7 +101,7 @@ function digiterm.register_terminal(termstring, desc)
       -- if channel received, set meta
       if fields.channel then
         meta:set_string("channel", fields.channel) -- set channel meta
-        meta:set_string("formspec", digiterm.formspec.operating(true)) -- refresh formspec
+        meta:set_string("formspec", digiterm.formspec_operating(true)) -- refresh formspec
         return
       end
       -- if submit, reset field print to output and send digiline
@@ -112,7 +110,7 @@ function digiterm.register_terminal(termstring, desc)
         meta:set_string("output", meta:get_string("channel").."@minetest:~$\n "..fields.input.."\n") -- repeat input
       else meta:set_string("input", fields.input) end -- else, do nothing
       -- refresh formspec
-      meta:set_string("formspec", digiterm.formspec.operating(meta:get_string("formspec"):sub(0, 1) ~= " "))
+      meta:set_string("formspec", digiterm.formspec_operating(meta:get_string("formspec"):sub(0, 1) ~= " "))
     end,
   })
 end
