@@ -14,14 +14,31 @@ end
 
 -- SYSTEM FUNCTIONS
 digiterm.system = {}
+-- turn on (not functional)
+function digiterm.system.on(pos, node)
+  minetest.swap_node({x = pos.x, y = pos.y, z = pos.z}, {name = "digiterm:"..node.."_bios"}) -- set node to bios
+  minetest.after(3.5, function(pos_)
+    minetest.swap_node({x = pos_.x, y = pos_.y, z = pos_.z}, {name = "digiterm:"..node.."_on"}) -- set node to on after 5 seconds
+  end, vector.new(pos))
+end
+-- turn off
+function digiterm.system.off(pos, termstring)
+  minetest.swap_node(pos, "digiterm:"..termstring.."_bios") -- set node to on
+end
+-- reboot
+function digiterm.system.reboot(pos, termstring)
+  digiterm.system.off(pos, termstring)
+  digiterm.system.on(pos, termstring)
+end
+-- /SYSTEM FUNCTIONS
 
-function digiterm.register_terminal(itemstring, desc)
+function digiterm.register_terminal(termstring, desc)
   -- off
-  minetest.register_node("digiterm:"..itemstring, {
+  minetest.register_node("digiterm:"..termstring, {
     description = desc.description,
     tiles = desc.off_tiles,
     paramtype2 = "facedir",
-    groups = {cracky = 2, not_in_creative_inventory = 1},
+    groups = {cracky = 2},
     sounds = default.node_sound_stone_defaults(),
     digiline = {
       receptor = {},
@@ -37,18 +54,20 @@ function digiterm.register_terminal(itemstring, desc)
         end
       },
     },
-    --on_rightclick = digiterm.system.on(pos, itemstring),
+    on_rightclick = function(pos)
+      digiterm.system.on(pos, termstring)
+    end,
   })
   -- bios
-  minetest.register_node("digiterm:"..itemstring.."_bios", {
+  minetest.register_node("digiterm:"..termstring.."_bios", {
     description = desc.description,
     tiles = desc.bios_tiles,
     paramtype2 = "facedir",
-  	groups = {cracky = 2, not_in_creative_inventory = 1},
+  	groups = {cracky = 2},
   	sounds = default.node_sound_stone_defaults(),
   })
   -- on
-  minetest.register_node("digiterm:"..itemstring.."_on", {
+  minetest.register_node("digiterm:"..termstring.."_on", {
     description = desc.description,
     tiles = desc.on_tiles,
     paramtype2 = "facedir",
@@ -90,6 +109,5 @@ function digiterm.register_terminal(itemstring, desc)
       -- refresh formspec
       meta:set_string("formspec", digiterm.formspec.operating(meta:get_string("formspec"):sub(0, 1) ~= " "))
     end,
-    --on_punch = digiterm.system.off(pos, itemstring),
   })
 end

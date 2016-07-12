@@ -16,7 +16,7 @@ digiterm.register_terminal("basic", {
 		"digiterm_side.png",
 		"digiterm_side.png",
 		"digiterm_side.png",
-		"bios.png^digiterm_front_off.png"
+		"digiterm_front_off.png^bios.png"
 	},
 	on_tiles = {
 		"digiterm_side.png",
