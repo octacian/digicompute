@@ -20,10 +20,15 @@ function digiterm.system.on(pos, node)
   minetest.after(3.5, function(pos_)
     minetest.swap_node({x = pos_.x, y = pos_.y, z = pos_.z}, {name = "digiterm:"..node.."_on"}) -- set node to on after 5 seconds
   end, vector.new(pos))
+  local meta = minetest.get_meta(pos) -- get meta
+  meta:set_string("formspec", digiterm.formspec.operating(true))
 end
 -- turn off
 function digiterm.system.off(pos, termstring)
-  minetest.swap_node(pos, "digiterm:"..termstring.."_bios") -- set node to on
+  local meta = minetest.get_meta(pos) -- get meta
+  meta:set_string("formspec", "") -- clear formspec
+  meta = nil -- clear meta variable
+  minetest.swap_node(pos, "digiterm:"..termstring) -- set node to off
 end
 -- reboot
 function digiterm.system.reboot(pos, termstring)
