@@ -1,18 +1,18 @@
--- digiterm/init.lua
-digiterm = {}
+-- digicompute/init.lua
+digicompute = {}
 -- variables
-digiterm.modpath = minetest.get_modpath("digiterm") -- modpath
-local modpath = digiterm.modpath -- modpath pointer
+digicompute.modpath = minetest.get_modpath("digicompute") -- modpath
+local modpath = digicompute.modpath -- modpath pointer
 
 -- logger
-function digiterm.log(content, log_type)
+function digicompute.log(content, log_type)
   if log_type == nil then log_type = "action" end
-  minetest.log(log_type, "[digiterm] "..content)
+  minetest.log(log_type, "[digicompute] "..content)
 end
 
 -- FORMSPECS
 -- normal
-function digiterm.formspec_normal(input, output)
+function digicompute.formspec_normal(input, output)
   if not output then local output = "" end
   if not input then local input = "" end
   -- formspec
@@ -26,7 +26,7 @@ function digiterm.formspec_normal(input, output)
   return formspec -- return formspec text
 end
 -- set channel (currently unused)
-function digiterm.formspec_name(computer)
+function digicompute.formspec_name(computer)
   if not computer then local computer = "" end -- use blank channel is none specified
   local formspec =
     "size[6,1.7]"..

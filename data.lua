@@ -5,13 +5,13 @@ datalib.table = {} -- internal table global
 -- logger
 function datalib.log(content, log_type)
   if log_type == nil then log_type = "action" end
-  minetest.log(log_type, "[digiterm:datalib] "..content)
+  minetest.log(log_type, "[digicompute:datalib] "..content)
 end
 
 -- global path variables
-datalib.modpath = minetest.get_modpath("digiterm") -- modpath
+datalib.modpath = minetest.get_modpath("digicompute") -- modpath
 datalib.worldpath = minetest.get_worldpath() -- worldpath
-datalib.datapath = datalib.worldpath.."/digiterm" -- path for general datalib storage
+datalib.datapath = datalib.worldpath.."/digicompute" -- path for general datalib storage
 -- local path variables
 local modpath = datalib.modpath
 local worldpath = datalib.worldpath

@@ -1,4 +1,4 @@
--- digiterm/nodes.lua
+-- digicompute/nodes.lua
 
 digiterm.register_terminal("basic", {
 	description = "Basic Digiterm",
