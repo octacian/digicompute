@@ -3,18 +3,20 @@
 -- SYSTEM FUNCTIONS
 -- turn on
 function digicompute.on(pos, node)
-  minetest.swap_node({x = pos.x, y = pos.y, z = pos.z}, {name = "digicompute:"..node.."_bios"}) -- set node to bios
+  local temp = minetest.get_node(pos) -- get node
+  minetest.swap_node({x = pos.x, y = pos.y, z = pos.z}, {name = "digicompute:"..node.."_bios", param2 = temp.param2}) -- set node to bios
   minetest.after(3.5, function(pos_)
-    minetest.swap_node({x = pos_.x, y = pos_.y, z = pos_.z}, {name = "digicompute:"..node.."_on"}) -- set node to on after 5 seconds
+    minetest.swap_node({x = pos_.x, y = pos_.y, z = pos_.z}, {name = "digicompute:"..node.."_on", param2 = temp.param2}) -- set node to on after 5 seconds
   end, vector.new(pos))
   local meta = minetest.get_meta(pos) -- get meta
   meta:set_string("formspec", digicompute.formspec_normal("", ""))
 end
 -- turn off
 function digicompute.off(pos, node)
-  minetest.swap_node({x = pos.x, y = pos.y, z = pos.z}, {name = "digicompute:"..node}) -- set node to off
+  local temp = minetest.get_node(pos) -- get node
   local meta = minetest.get_meta(pos) -- get meta
-  meta:set_string("formspec", nil) -- clear formspec
+  meta:set_string("formspec", "") -- clear formspec
+  minetest.swap_node({x = pos.x, y = pos.y, z = pos.z}, {name = "digicompute:"..node, param2 = temp.param2}) -- set node to off
 end
 -- reboot
 function digicompute.reboot(pos, node)
@@ -112,8 +114,8 @@ function digicompute.register_terminal(termstring, desc)
       -- if submit, check for keywords and process according to os
       if fields.submit then
         if fields.input == digicompute.os.clear then digicompute.clear("output", pos) -- clear output
-        elseif fields.input == digicompute.os.off then digicompute.off(pos, termstring) -- turn off
-        elseif fields.input == digicompute.os.reboot then digicompute.reboot(pos, termstring) -- reboot
+        elseif fields.input == digicompute.os.off then digicompute.off(pos, termstring) return -- turn off
+        elseif fields.input == digicompute.os.reboot then digicompute.reboot(pos, termstring) return -- reboot
         else digicompute.os.proc_input({x = pos.x, y = pos.y, z = pos.z}, fields.input) end -- else, hand over to OS
         digicompute.clear("input", pos) -- clear input field
       else meta:set_string("input", fields.input) end -- else, keep input
