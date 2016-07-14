@@ -38,11 +38,15 @@ function digicompute.register_terminal(termstring, desc)
   digicompute.os.load(desc.os) -- load os
   -- off
   minetest.register_node("digicompute:"..termstring, {
+    drawtype = "nodebox",
     description = desc.description,
     tiles = desc.off_tiles,
+    paramtype = "light",
     paramtype2 = "facedir",
     groups = {cracky = 2},
+    drop = "digicompute:"..termstring,
     sounds = default.node_sound_stone_defaults(),
+    node_box = desc.node_box,
     digiline = {
       receptor = {},
       effector = {
@@ -65,19 +69,27 @@ function digicompute.register_terminal(termstring, desc)
   })
   -- bios
   minetest.register_node("digicompute:"..termstring.."_bios", {
+    drawtype = "nodebox",
     description = desc.description,
     tiles = desc.bios_tiles,
+    paramtype = "light",
     paramtype2 = "facedir",
   	groups = {cracky = 2},
+    drop = "digicompute:"..termstring,
   	sounds = default.node_sound_stone_defaults(),
+    node_box = desc.node_box,
   })
   -- on
   minetest.register_node("digicompute:"..termstring.."_on", {
+    drawtype = "nodebox",
     description = desc.description,
     tiles = desc.on_tiles,
+    paramtype = "light",
     paramtype2 = "facedir",
   	groups = {cracky = 2},
+    drop = "digicompute:"..termstring,
   	sounds = default.node_sound_stone_defaults(),
+    node_box = desc.node_box,
     digiline = {
       receptor = {},
       effector = {

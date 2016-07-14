@@ -1,29 +1,35 @@
 -- digicompute/nodes.lua
 
-digiterm.register_terminal("basic", {
+digicompute.register_terminal("basic", {
 	description = "Basic Digiterm",
 	off_tiles = {
-		"digiterm_side.png",
-		"digiterm_side.png",
-		"digiterm_side.png",
-		"digiterm_side.png",
-		"digiterm_side.png",
-		"digiterm_front_off.png"
+		"updown.png",
+		"updown.png",
+		"right.png",
+		"left.png",
+		"back_off.png",
+		"front_off.png",
 	},
 	bios_tiles = {
-		"digiterm_side.png",
-		"digiterm_side.png",
-		"digiterm_side.png",
-		"digiterm_side.png",
-		"digiterm_side.png",
-		"digiterm_front_off.png^bios.png"
+		"updown.png",
+		"updown.png",
+		"right.png",
+		"left.png",
+		"back_off.png",
+		"front_off.png^bios.png",
 	},
 	on_tiles = {
-		"digiterm_side.png",
-		"digiterm_side.png",
-		"digiterm_side.png",
-		"digiterm_side.png",
-		"digiterm_side.png",
-		"digiterm_front.png"
-	}
+		"updown.png",
+		"updown.png",
+		"right.png",
+		"left.png",
+		"back.png",
+		"front.png"
+	},
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.125, 0.5, 0.5, 0.5}, -- computer
+		}
+	},
 })
