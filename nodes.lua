@@ -1,7 +1,7 @@
 -- digicompute/nodes.lua
 
-digicompute.register_terminal("basic", {
-	description = "Basic Digiterm",
+digicompute.register_terminal("default", {
+	description = "digicomputer",
 	off_tiles = {
 		"updown.png",
 		"updown.png",
