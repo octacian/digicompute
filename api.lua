@@ -9,7 +9,7 @@ function digicompute.on(pos, node)
     minetest.swap_node({x = pos_.x, y = pos_.y, z = pos_.z}, {name = "digicompute:"..node.."_on", param2 = temp.param2}) -- set node to on after 5 seconds
   end, vector.new(pos))
   local meta = minetest.get_meta(pos) -- get meta
-  meta:set_string("formspec", digicompute.formspec_normal("", ""))
+  meta:set_string("formspec", digicompute.formspec("", ""))
 end
 -- turn off
 function digicompute.off(pos, node)
@@ -120,7 +120,7 @@ function digicompute.register_terminal(termstring, desc)
       -- if name received, set
       if fields.name then
         meta:set_string("name", fields.name) -- set name
-        meta:set_string("formspec", digicompute.formspec_normal(meta:get_string("input"), meta:get_string("output"))) -- refresh formspec
+        meta:set_string("formspec", digicompute.formspec(meta:get_string("input"), meta:get_string("output"))) -- update formspec
         return
       end
       -- if submit, check for keywords and process according to os

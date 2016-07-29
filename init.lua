@@ -12,7 +12,7 @@ end
 
 -- FORMSPECS
 -- normal
-function digicompute.formspec_normal(input, output)
+function digicompute.formspec(input, output)
   if not output then local output = "" end
   if not input then local input = "" end
   -- formspec

@@ -30,5 +30,5 @@ end
 -- [function] refresh formspec
 function digicompute.os.refresh(pos)
   local meta = minetest.get_meta(pos) -- get meta
-  meta:set_string("formspec", digicompute.formspec_normal(meta:get_string("input"), meta:get_string("output")))
+  meta:set_string("formspec", digicompute.formspec(meta:get_string("input"), meta:get_string("output")))
 end
