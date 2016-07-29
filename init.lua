@@ -25,7 +25,7 @@ function digicompute.formspec(input, output)
     "button[8.7,10.43;1.30,1;submit;<enter>]"
   return formspec -- return formspec text
 end
--- set channel (currently unused)
+-- set name
 function digicompute.formspec_name(computer)
   if not computer then local computer = "" end -- use blank channel is none specified
   local formspec =
@@ -37,6 +37,7 @@ function digicompute.formspec_name(computer)
 end
 -- /FORMSPECS
 
+-- load resources
 if not minetest.get_modpath("datalib") then dofile(modpath.."/data.lua") end -- load data api if not datalib mod
 dofile(modpath.."/os.lua") -- load os api
 dofile(modpath.."/api.lua") -- load api

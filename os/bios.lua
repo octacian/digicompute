@@ -7,11 +7,13 @@ digicompute.os.network = false -- do not support network
 digicompute.os.on = "rightclick" -- on command (rightclick)
 digicompute.os.clear_on_close = false -- do not clear output on close
 
+-- when_on
+function digicompute.os.when_on(pos)
+  digicompute.os.set(pos, "output", "Welcome to BiosOS version 0.1.\n\n"..digicompute.os.get(pos, "name")..":~$ ") -- print welcome
+end
+
 -- process input
 function digicompute.os.proc_input(pos, input)
-  if digicompute.os.get("output") == "" then local n = "" else local n = "\n" end -- if output blank, do not use \n
-  digicompute.os.set(pos, "output", digicompute.os.get(pos, "output")..n..digicompute.os.get(pos, "name")..":~$ "..input) -- print input
-  -- process command
-  --if input == ""
+  digicompute.os.set(pos, "output", digicompute.os.get(pos, "output")..input.."\n"..digicompute.os.get(pos, "name")..":~$ ") -- print input
   digicompute.os.refresh(pos) -- refresh
 end
