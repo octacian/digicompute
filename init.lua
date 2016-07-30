@@ -32,7 +32,7 @@ function digicompute.formspec_name(computer)
     "size[6,1.7]"..
     default.gui_bg_img..
     "field[.25,0.50;6,1;name;Computer Name:;"..computer.."]"..
-    "button[4.95,1;1,1;submit;Set]"
+    "button[4.95,1;1,1;submit_name;Set]"
   return formspec
 end
 -- /FORMSPECS
