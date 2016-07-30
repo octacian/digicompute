@@ -1,12 +1,12 @@
 -- digicompute/os.lua
 digicompute.os = {} -- init os table
 local modpath = digicompute.modpath -- modpath pointer
-local path = digicompute.datapath -- datapath pointer
+local path = digicompute.path -- datapath pointer
 
 -- [function] load os
 function digicompute.os.load(os_name)
-  if datalib.dofile(modpath.."/os/"..os_name..".lua") ~= true then
-    if datalib.dofile(path.."/os/"..os_name.."/.lua") ~= true then
+  if digicompute.file.dofile(modpath.."/os/"..os_name..".lua") ~= true then
+    if digicompute.file.dofile(path.."/os/"..os_name.."/.lua") ~= true then
       -- print error
       digicompute.log(os_name.." os could not be found. Please place the OS file in "..modpath.."/os/ or "..path.."/os/ with extension '.lua'.", "error")
     end
