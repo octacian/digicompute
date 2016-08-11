@@ -143,17 +143,10 @@ function digicompute.register_terminal(termstring, desc)
         meta:set_string("name", fields.name) -- set name
         meta:set_string("setup", "true") -- set computer to configured
         -- create filesystem
-        digicompute.file.mkdir(path.."/"..fields.name.."/os/")
-        local conf = digicompute.file.read(modpath.."/bios/conf.lua")
-        local main = digicompute.file.read(modpath.."/bios/main.lua")
-        local start = digicompute.file.read(modpath.."/bios/start.lua")
-        digicompute.file.write(path.."/"..fields.name.."/os/conf.lua", conf)
-        digicompute.file.write(path.."/"..fields.name.."/os/main.lua", main)
-        digicompute.file.write(path.."/"..fields.name.."/os/start.lua", start)
-        digicompute.file.mkdir(path.."/"..fields.name.."/user/")
-        local conf = nil -- unset
-        local main = nil -- unset
-        local start = nil -- unset
+        datalib.mkdir(path.."/"..fields.name.."/os/")
+        datalib.copy(modpath.."/bios/conf.lua", path.."/"..fields.name.."/os/conf.lua")
+        datalib.copy(modpath.."/bios/main.lua", path.."/"..fields.name.."/os/main.lua")
+        datalib.copy(modpath.."/bios/start.lua", path.."/"..fields.name.."/os/start.lua")
         -- try to run when_on
         if not dofile(path.."/"..meta:get_string("name").."/os/start.lua") then
           meta:set_string("formspec", digicompute.formspec("", "")) -- set formspec

@@ -10,6 +10,10 @@ function digicompute.log(content, log_type)
   minetest.log(log_type, "[digicompute] "..content)
 end
 
+-- create mod world dir
+datalib.mkdir(datalib.worldpath.."/digicompute")
+digicompute.path = datalib.worldpath.."/digicompute"
+
 -- FORMSPECS
 -- normal
 function digicompute.formspec(input, output)
@@ -38,7 +42,6 @@ end
 -- /FORMSPECS
 
 -- load resources
-if not minetest.get_modpath("datalib") then dofile(modpath.."/data.lua") end -- load data api if not datalib mod
 dofile(modpath.."/os.lua") -- load os api
 dofile(modpath.."/api.lua") -- load api
 dofile(modpath.."/nodes.lua") -- load nodes
