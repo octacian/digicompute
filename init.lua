@@ -42,6 +42,5 @@ end
 -- /FORMSPECS
 
 -- load resources
-dofile(modpath.."/os.lua") -- load os api
 dofile(modpath.."/api.lua") -- load api
 dofile(modpath.."/nodes.lua") -- load nodes

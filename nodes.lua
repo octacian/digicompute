@@ -1,6 +1,6 @@
 -- digicompute/nodes.lua
 
-digicompute.register_terminal("default", {
+digicompute.register_computer("default", {
 	description = "digicomputer",
 	off_tiles = {
 		"top.png",

@@ -1,13 +1,6 @@
--- digicompute/os.lua
-digicompute.os = {} -- init os table
-local modpath = digicompute.modpath -- modpath pointer
-local path = digicompute.path -- datapath pointer
-
--- [function] refresh formspec
-function digicompute.os.refresh(pos)
-  local meta = minetest.get_meta(pos) -- get meta
-  meta:set_string("formspec", digicompute.formspec(meta:get_string("input"), meta:get_string("output")))
-end
+-- digicompute/env.lua --
+-- ENVIRONMENT --
+-----------------
 
 -- [function] create environment
 function digicompute.create_env(pos, fields)
@@ -25,7 +18,7 @@ function digicompute.create_env(pos, fields)
   -- string.rep(str, n) with a high value for n can be used to DoS
   -- the server. Therefore, limit max. length of generated string.
   local function safe_string_rep(str, n)
-  	if #str * n > mesecon.setting("luacontroller_string_rep_max", 64000) then
+  	if #str * n > 6400 then
   		debug.sethook() -- Clear hook
   		error("string.rep: string length overflow", 2)
   	end
@@ -96,7 +89,7 @@ function digicompute.create_env(pos, fields)
   -- ENVIRONMENT TABLE --
 
   local env = {
-    run = digicompute.os.run,
+    run = digicompute.run,
     set_string = set_string,
     get_string = get_string,
     set_int = set_int,
@@ -167,58 +160,4 @@ function digicompute.create_env(pos, fields)
     },
   }
   return env -- return table
-end
-
--- [function] run code (in sandbox env)
-function digicompute.os.run(f, env)
-  setfenv(f, env)
-  local e, msg = pcall(f)
-  if e == false then return msg end
-end
-
--- [function] run file under env
-function digicompute.os.runfile(pos, lpath, errloc, fields)
-  local meta = minetest.get_meta(pos)
-  local env = digicompute.create_env(pos, fields) -- environment
-  local f = loadfile(lpath) -- load func
-  local e = digicompute.os.run(f, env) -- run function
-  -- if error, call error handle function and re-run start
-  if e then
-    digicompute.os.handle_error(pos, e, errloc) -- handle error
-    local s = loadfile(path.."/"..meta:get_string("name").."/os/start.lua") -- load func
-    digicompute.os.run(s, env) -- run func
-    return false
-  end
-end
-
--- [function] handle error
-function digicompute.os.handle_error(pos, msg, file)
-  local meta = minetest.get_meta(pos) -- get meta
-  local name = meta:get_string("name") -- get name
-
-  -- [function] restore
-  local function restore()
-    -- if file is conf main or start, replace only
-    if file == "conf" then
-      datalib.copy(path.."/"..name.."/os/conf.lua", path.."/"..name.."/os/conf.old.lua")
-      datalib.copy(modpath.."/bios/conf.lua", path.."/"..name.."/os/conf.lua")
-    elseif file == "main" then
-      datalib.copy(path.."/"..name.."/os/main.lua", path.."/"..name.."/os/main.old.lua")
-      datalib.copy(modpath.."/bios/main.lua", path.."/"..name.."/os/main.lua")
-    elseif file == "start" then
-      datalib.copy(path.."/"..name.."/os/start.lua", path.."/"..name.."/os/start.old.lua")
-      datalib.copy(modpath.."/bios/start.lua", path.."/"..name.."/os/start.lua")
-    else -- else, restore all
-      datalib.copy(path.."/"..name.."/os/conf.lua", path.."/"..name.."/os/conf.old.lua")
-      datalib.copy(modpath.."/bios/conf.lua", path.."/"..name.."/os/conf.lua")
-      datalib.copy(path.."/"..name.."/os/main.lua", path.."/"..name.."/os/main.old.lua")
-      datalib.copy(modpath.."/bios/main.lua", path.."/"..name.."/os/main.lua")
-      datalib.copy(path.."/"..name.."/os/start.lua", path.."/"..name.."/os/start.old.lua")
-      datalib.copy(modpath.."/bios/start.lua", path.."/"..name.."/os/start.lua")
-    end
-  end
-
-  meta:set_string("output", "Error: \n"..msg.."\n\nRestoring OS in 13 seconds. Files will remain.") -- set output
-  digicompute.os.refresh(pos) -- refresh
-  minetest.after(15, restore) -- after 15 seconds, call restore func
 end
