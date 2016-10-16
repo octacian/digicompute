@@ -15,8 +15,12 @@ function digicompute.on(pos, node)
   if meta:get_string("setup") ~= "true" then
     meta:set_string("formspec", digicompute.formspec_name("")) -- set formspec
   else -- use default formspec
+		local fields = {
+			input = meta:get_string("input"),
+			output = meta:get_string("output"),
+		}
     -- if not when_on, use blank
-    if not dofile(path.."/"..meta:get_string("name").."/os/start.lua") then
+    if not digicompute.os.runfile(pos, path.."/"..meta:get_string("name").."/os/start.lua", "start", fields) then
       meta:set_string("formspec", digicompute.formspec("", "")) -- set formspec
     end
     digicompute.os.refresh(pos) -- refresh
@@ -134,34 +138,36 @@ function digicompute.register_terminal(termstring, desc)
       local name = meta:get_string("name") -- get name
       if name then os.remove(path.."/"..name) end -- try to remove files
     end,
-    on_receive_fields = function(pos, formname, fields, sender) -- precess formdata
+    on_receive_fields = function(pos, formname, fields, sender) -- process formdata
       local meta = minetest.get_meta(pos) -- get meta
-      digicompute.pos = pos -- make pos global
-      digicompute.input = fields.input -- make input global
+
       -- if name, set
       if fields.name then
         meta:set_string("name", fields.name) -- set name
         meta:set_string("setup", "true") -- set computer to configured
         -- create filesystem
         datalib.mkdir(path.."/"..fields.name.."/os/")
-        datalib.copy(modpath.."/bios/conf.lua", path.."/"..fields.name.."/os/conf.lua")
-        datalib.copy(modpath.."/bios/main.lua", path.."/"..fields.name.."/os/main.lua")
-        datalib.copy(modpath.."/bios/start.lua", path.."/"..fields.name.."/os/start.lua")
+        datalib.copy(modpath.."/bios/conf.lua", path.."/"..fields.name.."/os/conf.lua", false)
+        datalib.copy(modpath.."/bios/main.lua", path.."/"..fields.name.."/os/main.lua", false)
+        datalib.copy(modpath.."/bios/start.lua", path.."/"..fields.name.."/os/start.lua", false)
         -- try to run when_on
-        if not dofile(path.."/"..meta:get_string("name").."/os/start.lua") then
+        if not digicompute.os.runfile(pos, path.."/"..meta:get_string("name").."/os/start.lua", "start", fields) then
           meta:set_string("formspec", digicompute.formspec("", "")) -- set formspec
         end
         digicompute.os.refresh(pos) -- refresh
       end
 
       local name = meta:get_string("name") -- get name
-      dofile(path.."/"..name.."/os/conf.lua")
+			local c = loadfile(path.."/"..name.."/os/conf.lua")
+			local e, msg = pcall(c)
       -- if submitted, process basic commands, pass on to os
       if fields.submit then
         if fields.input == clear then meta:set_string("formspec", digicompute.formspec("",""))
         elseif fields.input == off then digicompute.off(pos, termstring) -- set off
         elseif fields.input == reboot then digicompute.reboot(pos, termstring) -- reboot
-        else dofile(path.."/"..name.."/os/main.lua") end -- turn over to os
+        else -- else, turn over to os
+          digicompute.os.runfile(pos, path.."/"..name.."/os/main.lua", "main", fields) -- run main.lua
+        end
       end
     end,
   })
