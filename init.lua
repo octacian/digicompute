@@ -23,10 +23,9 @@ function digicompute.formspec(input, output)
   local formspec =
     "size[10,11]"..
     default.gui_bg_img..
-    "textarea[.25,.25;10,10.5;output;Output:;"..output.."]"..
-    "button[0,9.5;10,1;update;Update Output]"..
-    "field[.25,10.75;9,1;input;;"..input.."]"..
-    "button[8.7,10.43;1.30,1;submit;<enter>]"
+    "textarea[.25,.25;10,11.5;output;Output:;"..output.."]"..
+    "field[.25,10.75;10,1;input;;"..input.."]"..
+    "field_close_on_enter[input;false]"
   return formspec -- return formspec text
 end
 -- set name

@@ -121,7 +121,7 @@ function digicompute.register_computer(termstring, desc)
 			local c = loadfile(path.."/"..name.."/os/conf.lua")
 			local e, msg = pcall(c)
       -- if submitted, process basic commands, pass on to os
-      if fields.submit then
+      if fields.input then
         if fields.input == clear then meta:set_string("formspec", digicompute.formspec("",""))
         elseif fields.input == off then digicompute.off(pos, termstring) -- set off
         elseif fields.input == reboot then digicompute.reboot(pos, termstring) -- reboot
