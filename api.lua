@@ -9,6 +9,7 @@ function digicompute.refresh(pos)
 end
 
 dofile(modpath.."/env.lua") -- do env file
+dofile(modpath.."/fs.lua") -- do fs api file
 
 -- turn on
 function digicompute.on(pos, node)
@@ -27,7 +28,7 @@ function digicompute.on(pos, node)
 			output = meta:get_string("output"),
 		}
     -- if not when_on, use blank
-    if not digicompute.runfile(pos, path.."/"..meta:get_string("name").."/os/start.lua", "start", fields) then
+    if not digicompute.fs.run_file(pos, "os/start.lua", fields, "start.lua") then
       meta:set_string("formspec", digicompute.formspec("", "")) -- set formspec
     end
     digicompute.refresh(pos) -- refresh
@@ -59,53 +60,6 @@ function digicompute.run(f, env)
   setfenv(f, env)
   local e, msg = pcall(f)
   if e == false then return msg end
-end
-
--- [function] run file under env
-function digicompute.runfile(pos, lpath, errloc, fields)
-  local meta = minetest.get_meta(pos)
-  local env = digicompute.create_env(pos, fields) -- environment
-  local f = loadfile(lpath) -- load func
-  local e = digicompute.run(f, env) -- run function
-  -- if error, call error handle function and re-run start
-  if e then
-    digicompute.handle_error(pos, e, errloc) -- handle error
-    local s = loadfile(path.."/"..meta:get_string("name").."/os/start.lua") -- load func
-    digicompute.run(s, env) -- run func
-    return false
-  end
-end
-
--- [function] handle error
-function digicompute.handle_error(pos, msg, file)
-  local meta = minetest.get_meta(pos) -- get meta
-  local name = meta:get_string("name") -- get name
-
-  -- [function] restore
-  local function restore()
-    -- if file is conf main or start, replace only
-    if file == "conf" then
-      datalib.copy(path.."/"..name.."/os/conf.lua", path.."/"..name.."/os/conf.old.lua")
-      datalib.copy(modpath.."/bios/conf.lua", path.."/"..name.."/os/conf.lua")
-    elseif file == "main" then
-      datalib.copy(path.."/"..name.."/os/main.lua", path.."/"..name.."/os/main.old.lua")
-      datalib.copy(modpath.."/bios/main.lua", path.."/"..name.."/os/main.lua")
-    elseif file == "start" then
-      datalib.copy(path.."/"..name.."/os/start.lua", path.."/"..name.."/os/start.old.lua")
-      datalib.copy(modpath.."/bios/start.lua", path.."/"..name.."/os/start.lua")
-    else -- else, restore all
-      datalib.copy(path.."/"..name.."/os/conf.lua", path.."/"..name.."/os/conf.old.lua")
-      datalib.copy(modpath.."/bios/conf.lua", path.."/"..name.."/os/conf.lua")
-      datalib.copy(path.."/"..name.."/os/main.lua", path.."/"..name.."/os/main.old.lua")
-      datalib.copy(modpath.."/bios/main.lua", path.."/"..name.."/os/main.lua")
-      datalib.copy(path.."/"..name.."/os/start.lua", path.."/"..name.."/os/start.old.lua")
-      datalib.copy(modpath.."/bios/start.lua", path.."/"..name.."/os/start.lua")
-    end
-  end
-
-  meta:set_string("output", "Error: \n"..msg.."\n\nRestoring OS in 13 seconds. Files will remain.") -- set output
-  digicompute.refresh(pos) -- refresh
-  minetest.after(15, restore) -- after 15 seconds, call restore func
 end
 
 dofile(modpath.."/c_api.lua") -- do computer API file

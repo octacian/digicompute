@@ -33,8 +33,16 @@ function digicompute.register_computer(termstring, desc)
         end
       },
     },
+    after_place_node = function(pos, placer)
+      local meta = minetest.get_meta(pos)
+      meta:set_string("owner", placer:get_player_name())
+    end,
     on_rightclick = function(pos)
       digicompute.on(pos, termstring)
+    end,
+    on_destruct = function(pos)
+      local meta = minetest.get_meta(pos) -- get meta
+      if meta:get_string("name") then digicompute.fs.rm(pos) end
     end,
   })
   -- bios
@@ -44,8 +52,8 @@ function digicompute.register_computer(termstring, desc)
     tiles = desc.bios_tiles,
     paramtype = "light",
     paramtype2 = "facedir",
-  	groups = {cracky = 2, not_in_creative_inventory = 1},
-    drop = "digicompute:"..termstring,
+    drop = "",
+  	groups = {unbreakable = 1, not_in_creative_inventory = 1},
   	sounds = default.node_sound_stone_defaults(),
     node_box = desc.node_box,
   })
@@ -95,8 +103,7 @@ function digicompute.register_computer(termstring, desc)
     end,
     on_destruct = function(pos)
       local meta = minetest.get_meta(pos) -- get meta
-      local name = meta:get_string("name") -- get name
-      if name then os.remove(path.."/"..name) end -- try to remove files
+      if meta:get_string("name") then digicompute.fs.rm(pos) end
     end,
     on_receive_fields = function(pos, formname, fields, sender) -- process formdata
       local meta = minetest.get_meta(pos) -- get meta
@@ -105,20 +112,16 @@ function digicompute.register_computer(termstring, desc)
       if fields.name then
         meta:set_string("name", fields.name) -- set name
         meta:set_string("setup", "true") -- set computer to configured
-        -- create filesystem
-        datalib.mkdir(path.."/"..fields.name.."/os/")
-        datalib.copy(modpath.."/bios/conf.lua", path.."/"..fields.name.."/os/conf.lua", false)
-        datalib.copy(modpath.."/bios/main.lua", path.."/"..fields.name.."/os/main.lua", false)
-        datalib.copy(modpath.."/bios/start.lua", path.."/"..fields.name.."/os/start.lua", false)
+        digicompute.fs.init(pos, fields.name) -- initialize filesystem
         -- try to run when_on
-        if not digicompute.runfile(pos, path.."/"..meta:get_string("name").."/os/start.lua", "start", fields) then
+        if not digicompute.fs.run_file(pos, "os/start.lua", fields, "start.lua") then
           meta:set_string("formspec", digicompute.formspec("", "")) -- set formspec
         end
         digicompute.refresh(pos) -- refresh
       end
 
       local name = meta:get_string("name") -- get name
-			local c = loadfile(path.."/"..name.."/os/conf.lua")
+			local c = loadfile(path.."/"..meta:get_string("owner").."/"..name.."/os/conf.lua")
 			local e, msg = pcall(c)
       -- if submitted, process basic commands, pass on to os
       if fields.input then
@@ -126,7 +129,7 @@ function digicompute.register_computer(termstring, desc)
         elseif fields.input == off then digicompute.off(pos, termstring) -- set off
         elseif fields.input == reboot then digicompute.reboot(pos, termstring) -- reboot
         else -- else, turn over to os
-          digicompute.runfile(pos, path.."/"..name.."/os/main.lua", "main", fields) -- run main.lua
+          digicompute.fs.run_file(pos, "os/main.lua", fields, "main.lua") -- run main.lua
         end
       end
     end,
