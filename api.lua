@@ -11,27 +11,6 @@ end
 dofile(modpath.."/fs.lua") -- do fs api file
 dofile(modpath.."/env.lua") -- do env file
 
--- [function] run file under env
-function digicompute.fs.run_file(pos, lpath, fields, replace)
-  local meta = minetest.get_meta(pos)
-  local lpath = path.."/"..meta:get_string("owner").."/"..meta:get_string("name").."/"..lpath
-  local env = digicompute.create_env(pos, fields) -- environment
-  local f = loadfile(lpath) -- load func
-  local e = digicompute.run(f, env) -- run function
-  -- if error, call error handle function and re-run start
-  if e and replace then
-    datalib.copy(lpath, lpath..".old")
-    datalib.copy(modpath.."/bios/"..replace, lpath)
-    meta:set_string("output", "Error: \n"..msg.."\n\nRestoring OS, modified files will remain.") -- set output
-    digicompute.refresh(pos) -- refresh
-    minetest.after(13, function() -- after 13 seconds, run start
-      local s = loadfile(path.."/"..meta:get_string("owner").."/"..meta:get_string("name").."/os/start.lua") -- load func
-      digicompute.run(s, env) -- run func
-      return false
-    end)
-  elseif e and not replace then return e end -- elseif no replace and error, return error msg
-end
-
 -- turn on
 function digicompute.on(pos, node)
   local temp = minetest.get_node(pos) -- get node
@@ -81,6 +60,29 @@ function digicompute.run(f, env)
   setfenv(f, env)
   local e, msg = pcall(f)
   if e == false then return msg end
+end
+
+-- [function] run file under env
+function digicompute.fs.run_file(pos, lpath, fields, replace)
+  local meta = minetest.get_meta(pos)
+  local lpath = path.."/"..meta:get_string("owner").."/"..meta:get_string("name").."/"..lpath
+  local env = digicompute.create_env(pos, fields) -- environment
+  local f, msg = loadfile(lpath) -- load func
+
+  -- if error, call error handle function and re-run start
+  if msg and replace then
+    datalib.copy(lpath, lpath..".old")
+    datalib.copy(modpath.."/bios/"..replace, lpath)
+    meta:set_string("output", "Error: \n"..msg.."\n\nRestoring OS, modified files will remain.") -- set output
+    digicompute.refresh(pos) -- refresh
+    minetest.after(13, function() -- after 13 seconds, run start
+      local s = loadfile(path.."/"..meta:get_string("owner").."/"..meta:get_string("name").."/os/start.lua") -- load func
+      digicompute.run(s, env) -- run func
+      digicompute.refresh(pos) -- refresh
+      return false
+    end)
+  elseif msg and not replace then return msg -- elseif no replace and error, return error msg
+  else local res = digicompute.run(f, env) end -- else, run function
 end
 
 dofile(modpath.."/c_api.lua") -- do computer API file
