@@ -23,7 +23,7 @@ function digicompute.fs.init(pos, cname)
 end
 
 -- [function] de-initialize fs (delete)
-function digicompute.fs.rm(pos)
+function digicompute.fs.deinit(pos)
   local meta = minetest.get_meta(pos) -- meta
   local player = meta:get_string("owner") -- owner username
   local cname = meta:get_string("name") -- name
@@ -52,8 +52,9 @@ function digicompute.fs.rm(pos)
 end
 
 -- [function] get file contents
-function digicompute.fs.get_file(pos, cname, fpath)
+function digicompute.fs.get_file(pos, fpath)
   local meta = minetest.get_meta(pos) -- meta
+  local cname = meta:get_string("name") -- computer name
   local player = meta:get_string("owner") -- owner username
   local cpath = path.."/"..player.."/"..cname -- comp path
   local contents = datalib.read(cpath.."/"..fpath)
@@ -62,8 +63,9 @@ function digicompute.fs.get_file(pos, cname, fpath)
 end
 
 -- [function] get directory contents
-function digicompute.fs.get_dir(pos, cname, dpath)
+function digicompute.fs.get_dir(pos, dpath)
   local meta = minetest.get_meta(pos) -- meta
+  local cname = meta:get_string("name") -- computer name
   local player = meta:get_string("owner") -- owner username
   local cpath = path.."/"..player.."/"..cname -- comp path
   local files = minetest.get_dir_list(cpath.."/"..dpath, false)
@@ -72,23 +74,66 @@ function digicompute.fs.get_dir(pos, cname, dpath)
   return { error = nil, contents = { files = files, subdirs = subdirs } }
 end
 
--- [function] run file under env
-function digicompute.fs.run_file(pos, lpath, fields, replace)
-  local meta = minetest.get_meta(pos)
-  local lpath = path.."/"..meta:get_string("owner").."/"..meta:get_string("name").."/"..lpath
-  local env = digicompute.create_env(pos, fields) -- environment
-  local f = loadfile(lpath) -- load func
-  local e = digicompute.run(f, env) -- run function
-  -- if error, call error handle function and re-run start
-  if e and replace then
-    datalib.copy(lpath, lpath..".old")
-    datalib.copy(modpath.."/bios/"..replace, lpath)
-    meta:set_string("output", "Error: \n"..msg.."\n\nRestoring OS, modified files will remain.") -- set output
-    digicompute.refresh(pos) -- refresh
-    minetest.after(13, function() -- after 13 seconds, run start
-      local s = loadfile(path.."/"..meta:get_string("owner").."/"..meta:get_string("name").."/os/start.lua") -- load func
-      digicompute.run(s, env) -- run func
-      return false
-    end)
-  elseif e and not replace then return e end -- elseif no replace and error, return error msg
+-- [function] exists
+function digicompute.fs.exists(pos, fpath)
+  local meta = minetest.get_meta(pos) -- meta
+  local cname = meta:get_string("name") -- computer name
+  local name = meta:get_string("owner") -- owner username
+  local res = datalib.exists(path.."/"..name.."/"..cname.."/"..fpath)
+  if res == true then return "File exists."
+  else return "File does not exist."
+  end
 end
+
+-- [function] create directory
+function digicompute.fs.mkdir(pos, fpath)
+  local meta = minetest.get_meta(pos) -- meta
+  local cname = meta:get_string("name") -- computer name
+  local name = meta:get_string("owner") -- owner username
+  local res = datalib.mkdir(path.."/"..name.."/"..cname.."/"..fpath)
+  if res == true then return "Directory already exists." end
+end
+
+-- [function] remove directory
+function digicompute.fs.rmdir(pos, fpath)
+  local meta = minetest.get_meta(pos) -- meta
+  local cname = meta:get_string("name") -- computer name
+  local name = meta:get_string("owner") -- owner username
+  local res = datalib.rmdir(path.."/"..name.."/"..cname.."/"..fpath)
+  if res == false then return "Directory does not exist." end
+end
+
+-- [function] create file
+function digicompute.fs.create(pos, fpath)
+  local meta = minetest.get_meta(pos) -- meta
+  local cname = meta:get_string("name") -- computer name
+  local name = meta:get_string("owner") -- owner username
+  local res = datalib.create(path.."/"..name.."/"..cname.."/"..fpath)
+  if res == true then return "File already exists." end
+end
+
+-- [function] write
+function digicompute.fs.write(pos, fpath, data)
+  local meta = minetest.get_meta(pos) -- meta
+  local cname = meta:get_string("name") -- computer name
+  local name = meta:get_string("owner") -- owner username
+  datalib.write(path.."/"..name.."/"..cname.."/"..fpath, data, false)
+end
+
+-- [function] append
+function digicompute.fs.append(pos, fpath, data)
+  local meta = minetest.get_meta(pos) -- meta
+  local cname = meta:get_string("name") -- computer name
+  local name = meta:get_string("owner") -- owner username
+  datalib.append(path.."/"..name.."/"..cname.."/"..fpath, data, false)
+end
+
+-- [function] copy file
+function digicompute.fs.copy(pos, fpath, npath)
+  local meta = minetest.get_meta(pos) -- meta
+  local cname = meta:get_string("name") -- computer name
+  local name = meta:get_string("owner") -- owner username
+  local res = datalib.copy(path.."/"..name.."/"..cname.."/"..fpath, path.."/"..name.."/"..cname.."/"..npath)
+  if res == false then return "Base file does not exist." end
+end
+digicompute.fs.cp = digicompute.fs.copy

@@ -42,7 +42,7 @@ function digicompute.register_computer(termstring, desc)
     end,
     on_destruct = function(pos)
       local meta = minetest.get_meta(pos) -- get meta
-      if meta:get_string("name") then digicompute.fs.rm(pos) end
+      if meta:get_string("name") then digicompute.fs.deinit(pos) end
     end,
   })
   -- bios
@@ -103,7 +103,7 @@ function digicompute.register_computer(termstring, desc)
     end,
     on_destruct = function(pos)
       local meta = minetest.get_meta(pos) -- get meta
-      if meta:get_string("name") then digicompute.fs.rm(pos) end
+      if meta:get_string("name") then digicompute.fs.deinit(pos) end
     end,
     on_receive_fields = function(pos, formname, fields, sender) -- process formdata
       local meta = minetest.get_meta(pos) -- get meta

@@ -37,71 +37,133 @@ function digicompute.create_env(pos, fields)
   	return string.find(...)
   end
 
-  -- [function] set
-  local function set_string(key, value)
-    return meta:set_string(key, value)
+  -- [function] get attr (from meta)
+  local function get_attr(key)
+    return meta:get_string(key) or nil
   end
-  -- [function] get
-  local function get_string(key)
-    return meta:get_string(key)
+  -- [function] get userdata
+  local function get_userdata(key)
+    local t = minetest.deserialize(meta:get_string("userspace"))
+    return t[key] or nil
   end
-  -- [function] set int
-  local function set_int(key, value)
-    return meta:set_int(key, value)
-  end
-  -- [function] get int
-  local function get_int(key)
-    return meta:get_int(key)
-  end
-  -- [function] set float
-  local function set_float(key, value)
-    return meta:set_float(key, value)
-  end
-  -- [function] get float
-  local function get_float(key)
-    return meta:get_float(key)
+  -- [function] set userdata
+  local function set_userdata(key, value)
+    local t = minetest.deserialize(meta:get_string("userspace"))
+    t[key] = value
+    return meta:set_string("userspace", minetest.serialize(t))
   end
   -- [function] get input
   local function get_input()
-    return meta:get_string("input")
+    return meta:get_string("input") or nil
   end
   -- [function] set input
   local function set_input(value)
-    return meta:set_string("input", value)
+    return meta:set_string("input", value) or nil
   end
   -- [function] get output
   local function get_output()
-    return meta:get_string("output")
+    return meta:get_string("output") or nil
   end
   -- [function] set output
   local function set_output(value)
-    return meta:set_string("output", value)
+    return meta:set_string("output", value) or nil
   end
   -- [function] get field
   local function get_field(key)
-    return fields[key]
+    return fields[key] or nil
   end
   -- [function] refresh
   local function refresh()
     meta:set_string("formspec", digicompute.formspec(meta:get_string("input"), meta:get_string("output")))
+    return true
+  end
+
+  -- filesystem API
+
+  -- [function] get file (read)
+  local function get_file(path)
+    local res = digicompute.fs.get_file(pos, path)
+    if res then return res end
+  end
+
+  -- [function] get directory contents
+  local function get_dir(path)
+    local res = digicompute.fs.get_dir(pos, path)
+    if res then return res end
+  end
+
+  -- [function] exists
+  local function exists(path)
+    local res = digicompute.fs.exists(pos, path)
+    if res then return res end
+  end
+
+  -- [function] mkdir
+  local function mkdir(path)
+    local res = digicompute.fs.exists(pos, path)
+    if res then return res end
+  end
+
+  -- [function] rmdir
+  local function rmdir(path)
+    local res = digicompute.fs.rmdir(pos, path)
+    if res then return res end
+  end
+
+  -- [function] mkdir
+  local function mkdir(path)
+    local res = digicompute.fs.exists(pos, path)
+    if res then return res end
+  end
+
+  -- [function] create file
+  local function create(path)
+    local res = digicompute.fs.create(pos, path)
+    if res then return res end
+  end
+
+  -- [function] write
+  local function write(path, data)
+    local res = digicompute.fs.write(pos, path, data)
+    if res then return res end
+  end
+
+  -- [function] append
+  local function append(path, data)
+    local res = digicompute.fs.append(pos, path, data)
+    if res then return res end
+  end
+
+  -- [function] copy
+  local function copy(path, npath)
+    local res = digicompute.fs.copy(pos, path, npath)
+    if res then return res end
   end
 
   -- ENVIRONMENT TABLE --
 
   local env = {
     run = digicompute.run,
-    set_string = set_string,
-    get_string = get_string,
-    set_int = set_int,
-    get_int = get_int,
-    set_float = set_float,
-    get_float = get_float,
+    get_attr = get_attr,
+    get_userdata = get_userdata,
+    set_userdata = set_userdata,
     get_input = get_input,
     set_input = set_input,
     get_output = get_output,
     set_output = set_output,
     get_field = get_field,
     refresh = refresh,
+    fs = {
+      read = get_file,
+      list = get_dir,
+      check = exists,
+      mkdir = mkdir,
+      rmdir = rmdir,
+      touch = create,
+      write = write,
+      copy = copy,
+      cp = copy,
+    },
     string = {
       byte = string.byte,
       char = string.char,

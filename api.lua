@@ -8,8 +8,29 @@ function digicompute.refresh(pos)
   meta:set_string("formspec", digicompute.formspec(meta:get_string("input"), meta:get_string("output")))
 end
 
-dofile(modpath.."/env.lua") -- do env file
 dofile(modpath.."/fs.lua") -- do fs api file
+dofile(modpath.."/env.lua") -- do env file
+
+-- [function] run file under env
+function digicompute.fs.run_file(pos, lpath, fields, replace)
+  local meta = minetest.get_meta(pos)
+  local lpath = path.."/"..meta:get_string("owner").."/"..meta:get_string("name").."/"..lpath
+  local env = digicompute.create_env(pos, fields) -- environment
+  local f = loadfile(lpath) -- load func
+  local e = digicompute.run(f, env) -- run function
+  -- if error, call error handle function and re-run start
+  if e and replace then
+    datalib.copy(lpath, lpath..".old")
+    datalib.copy(modpath.."/bios/"..replace, lpath)
+    meta:set_string("output", "Error: \n"..msg.."\n\nRestoring OS, modified files will remain.") -- set output
+    digicompute.refresh(pos) -- refresh
+    minetest.after(13, function() -- after 13 seconds, run start
+      local s = loadfile(path.."/"..meta:get_string("owner").."/"..meta:get_string("name").."/os/start.lua") -- load func
+      digicompute.run(s, env) -- run func
+      return false
+    end)
+  elseif e and not replace then return e end -- elseif no replace and error, return error msg
+end
 
 -- turn on
 function digicompute.on(pos, node)
