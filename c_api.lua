@@ -561,6 +561,7 @@ function digicompute.register_computer(itemstring, def)
   })
   -- bios
   minetest.register_node("digicompute:"..itemstring.."_bios", {
+    light_source = def.light_source or 7,
     digicompute = {
       state = "bios",
       base = itemstring,
@@ -582,6 +583,7 @@ function digicompute.register_computer(itemstring, def)
   })
   -- on
   minetest.register_node("digicompute:"..itemstring.."_on", {
+    light_source = def.light_source or 7,
     digicompute = {
       state = "on",
       base = itemstring,
