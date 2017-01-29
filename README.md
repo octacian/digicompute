@@ -1,6 +1,6 @@
 Digital Computers [digicompute]
 =========================
-* Version 0.1, unstable
+* Version 0.5, beta
 * Licence: MIT (see LICENSE)
 * [Github Repository](https://github.com/octacian/digicompute)
 
@@ -17,8 +17,8 @@ To get started, just place down a computer, right click on it to power it up, an
 * mesecon support
 
 ### API
-digicompute is a mod that is meant to be customized, and tweaked by both modders and players. Along with the computers available out of the box, a powerful API is provided allowing modders to easily and quickly register their own computers, peripherals, internal components, and other devices.
+digicompute is a mod that is meant to be customized, and tweaked by both modders and players. Along with the computers available out of the box, a powerful API is provided allowing modders to easily and quickly register their own computers, and soon peripherals, internal components, and other devices.
 
 The OS API allows anybody to create their own operating system to run and distrubute right on their digicomputers. The possibilities are becoming endless, as operating systems will soon be able to further use the formspec to create a graphical experience right inside Minetest.
 
-To learn more about the API, see the [Wiki](https://github.com/octacian/digicompute/wiki/).
+To learn more about the API, see the [Wiki](https://github.com/octacian/digicompute/wiki/). Or, see the files found in the `doc` directory.

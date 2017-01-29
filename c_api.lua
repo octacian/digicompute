@@ -17,9 +17,12 @@ local computers = {}
 
 -- [function] load computers
 function digicompute.load_computers()
-  local data = minetest.deserialize(digicompute.builtin.read(path.."/computers.txt"))
-  if type(data) == "table" then
-    computers = data
+  local res  = digicompute.builtin.read(path.."/computers.txt")
+  if res then
+    res = minetest.deserialize(res)
+    if type(res) == "table" then
+      computers = res
+    end
   end
 end
 

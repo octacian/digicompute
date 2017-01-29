@@ -1,7 +1,7 @@
 -- digicompute/init.lua
 digicompute = {}
 
-digicompute.VERSION = 0.1
+digicompute.VERSION = 0.5
 digicompute.RELEASE_TYPE = "beta"
 
 digicompute.path = minetest.get_worldpath().."/digicompute/" -- digicompute directory
