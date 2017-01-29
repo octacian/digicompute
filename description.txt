@@ -1,0 +1,3 @@
+This, is the first mod ever to attempt to provide fully functional computer and networking devices to the Minetest players.
+Originally inspired by digiterm, the mod has begun to take an entirely new direction. Computers are completely stand
+alone. They require no other mods to function, and can run alone or as a group.
