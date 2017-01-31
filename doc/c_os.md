@@ -34,6 +34,11 @@ Returns the value of the output buffer. Shorthand for `get_attr("output")`.
 
 Set the output buffer to any string. This is the write method for the output attribute.
 
+#### `set_output_editable(bool)`
+**Usage:** `set_output_editable(<true/false (bool)>)`
+
+Makes the output buffer editable. Useful for programs that would like a larger input field. However, it can be used in any way wanted as `get_output` and `set_output` are still functional.
+
 #### `get_input()`
 **Usage:** `get_input()`
 

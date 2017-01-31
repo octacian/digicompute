@@ -116,18 +116,27 @@ digicompute.c.forms = {
       local meta     = minetest.get_meta(pos)
       local input    = minetest.formspec_escape(meta:get_string("input"))
       local help     = minetest.formspec_escape(meta:get_string("help"))
-      local output   = meta:get_string("output"):split("\n", true)
+      local output   = meta:get_string("output")
 
-      for i, line in ipairs(output) do
-      	output[i] = minetest.formspec_escape(line)
+      if meta:get_string("output_editable") == "true" then
+        output = minetest.formspec_escape(output)
+        output =
+          "textarea[-0.03,-0.4;10.62,13.03;output;;"..output.."]"
+      else
+        output = output:split("\n", true)
+        for i, line in ipairs(output) do
+        	output[i] = minetest.formspec_escape(line)
+        end
+        output =
+          "tableoptions[background=#000000FF;highlight=#00000000;border=false]"..
+          "table[-0.25,-0.38;10.38,11.17;list_credits;"..table.concat(output, ",")..";"..#output.."]"
       end
 
       return
         "size[10,11]"..
         "tabheader[0,0;tabs;Command Line,Settings;1]"..
         "bgcolor[#000000FF;]"..
-        "tableoptions[background=#000000FF;highlight=#00000000;border=false]"..
-        "table[-0.25,-0.38;10.38,11.17;list_credits;"..table.concat(output, ",")..";"..#output.."]"..
+        output..
         "button[9.56,10.22;0.8,2;help;?]"..
         "tooltip[help;"..help.."]"..
         "field[-0.02,10.99;10.1,1;input;;"..input.."]"..
@@ -390,6 +399,14 @@ function digicompute.c:make_env(pos, player)
   -- [function] set output
   function main.set_output(value)
     return meta:set_string("output", value)
+  end
+  -- [function] set whether output is writable
+  function main.set_output_editable(bool)
+    if bool == true then
+      meta:set_string("output_editable", "true")
+    else
+      meta:set_string("output_editable", "false")
+    end
   end
   -- [function] get input
   function main.get_input()
