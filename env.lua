@@ -107,7 +107,7 @@ function digicompute.run_code(code, env)
   -- Use instruction counter to stop execution
   -- after 10000 events
   debug.sethook(function()
-    return false, "Code timed out!"
+    error("Code timed out!", 2)
   end, "", 10000)
   local ok, ret = pcall(f)
   debug.sethook()  -- Clear hook
