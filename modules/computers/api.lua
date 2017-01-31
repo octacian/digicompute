@@ -358,7 +358,7 @@ function digicompute.c:make_env(pos, player)
 
   local main = {}
 
-  -- [local function] print
+  -- [function] print
   function main.print(contents, newline)
     if type(contents) ~= "string" then
       contents = dump(contents)
@@ -371,7 +371,7 @@ function digicompute.c:make_env(pos, player)
 
     meta:set_string("output", meta:get_string("output")..newline..contents)
   end
-  -- [local function] set help
+  -- [function] set help
   function main.set_help(value)
     if not value or type(value) ~= "string" then
       value = "Type a command and press enter."
@@ -379,31 +379,31 @@ function digicompute.c:make_env(pos, player)
 
     return meta:set_string("help", value)
   end
-  -- [local function] get attribute
+  -- [function] get attribute
   function main.get_attr(key)
     return meta:get_string(key) or nil
   end
-  -- [local function] get output
+  -- [function] get output
   function main.get_output()
     return meta:get_string("output") or nil
   end
-  -- [local function] set output
+  -- [function] set output
   function main.set_output(value)
     return meta:set_string("output", value)
   end
-  -- [local function] get input
+  -- [function] get input
   function main.get_input()
     return meta:get_string("input") or nil
   end
-  -- [local function] set input
+  -- [function] set input
   function main.set_input(value)
     return meta:set_string("input", value)
   end
-  -- [local function] get os value
+  -- [function] get os value
   function main.get_os(key)
     return minetest.deserialize(meta:get_string("os"))[key] or nil
   end
-  -- [local function] set os value
+  -- [function] set os value
   function main.set_os(key, value)
     local allowed_keys = {
       clear = true,
@@ -420,21 +420,21 @@ function digicompute.c:make_env(pos, player)
       return false
     end
   end
-  -- [local function] get userdata value
+  -- [function] get userdata value
   function main.get_userdata(key)
     return minetest.deserialize(meta:get_string("userdata"))[key] or nil
   end
-  -- [local function] set userdata value
+  -- [function] set userdata value
   function main.set_userdata(key, value)
     local table = minetest.deserialize(meta:get_string("userdata")) or {}
     table[key] = value
     return meta:set_string("userdata", minetest.serialize(table))
   end
-  -- [local function] refresh
+  -- [function] refresh
   function main.refresh()
     return digicompute.c:open(pos, minetest.get_player_by_name(meta:get_string("current_user")))
   end
-  -- [local function] run code
+  -- [function] run code
   function main.run(code)
     return digicompute.c:run_code(pos, player, code)
   end
@@ -444,50 +444,50 @@ function digicompute.c:make_env(pos, player)
   local fs    = {}
   local cpath = meta:get_string("path")
 
-  -- [local function] exists
+  -- [function] exists
   function fs.exists(path)
     return digicompute.builtin.exists(cpath..path)
   end
-  -- [local function] create file
+  -- [function] create file
   function fs.create(path)
     return digicompute.builtin.create(cpath..path)
   end
-  -- [local function] remove file
+  -- [function] remove file
   function fs.remove(path)
     return os.remove(cpath..path)
   end
-  -- [local function] write to file
+  -- [function] write to file
   function fs.write(path, data, mode)
     if type(data) ~= "string" then
       data = dump(data)
     end
     return digicompute.builtin.write(cpath..path, data, mode)
   end
-  -- [local function] read file
+  -- [function] read file
   function fs.read(path)
     return digicompute.builtin.read(cpath..path)
   end
-  -- [local function] list directory contents
+  -- [function] list directory contents
   function fs.list(path)
     return digicompute.builtin.list(cpath..path)
   end
-  -- [local function] copy file
+  -- [function] copy file
   function fs.copy(original, new)
     return digicompute.builtin.copy(cpath..original, cpath..new)
   end
-  -- [local function] create directory
+  -- [function] create directory
   function fs.mkdir(path)
     return digicompute.builtin.mkdir(cpath..path)
   end
-  -- [local function] remove directory
+  -- [function] remove directory
   function fs.rmdir(path)
     return digicompute.builtin.rmdir(cpath..path)
   end
-  -- [local function] copy directory
+  -- [function] copy directory
   function fs.cpdir(original, new)
     return digicompute.builtin.cpdir(cpath..original, cpath..new)
   end
-  -- [local function] run file
+  -- [function] run file
   function fs.run(path)
     return digicompute.c:run_file(pos, player, path)
   end
