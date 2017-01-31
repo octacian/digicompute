@@ -166,7 +166,7 @@ digicompute.c.forms = {
         "tabheader[0,0;tabs;Command Line,Settings;2]"..
         default.gui_bg_img..
         "button[0.5,0.25;9,1;reset;Reset Filesystem]"..
-        "tooltip[reset;Wipes all files and OS data replacing it with the basic BiosOS.]"..
+        "tooltip[reset;Wipes all files and OS data replacing it with the basic octOS.]"..
         "label[0.5,10.35;digicompute Version: "..tostring(digicompute.VERSION)..", "..
           digicompute.RELEASE_TYPE.."]"..
         "label[0.5,10.75;(c) Copywrite "..tostring(os.date("%Y")).." "..
@@ -262,7 +262,7 @@ function digicompute.c:init(pos)
   if path and path ~= "" then
     digicompute.builtin.mkdir(main_path..meta:get_string("owner"))
     digicompute.builtin.mkdir(path)
-    digicompute.builtin.cpdir(digicompute.modpath.."/bios/", path.."os")
+    digicompute.builtin.cpdir(digicompute.modpath.."/octos/", path.."os")
     digicompute.c:run_file(pos, meta:get_string("owner"), "os/start.lua")
     digicompute.log("Initialized computer "..meta:get_string("id").." owned by "..
       meta:get_string("owner").." at "..minetest.pos_to_string(pos))
