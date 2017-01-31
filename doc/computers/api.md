@@ -54,7 +54,7 @@ digicompute.register_computer("default", {
 })
 ```
 
-Above is example code from the default computer.
+Above is example code from the default computer. Computers should typically be registered in the `nodes.lua` file of the computers module unless you are registering a computer from a different mod.
 
 ## Advanced API
 This API is more of a documentation of pre-existing API functions for developers new to this mod who would like to get started. The Advanced API documentation is sectioned out as it is in the code.
