@@ -1,6 +1,9 @@
 # Documentation
 The digicompute API is divided among several different files. Unless otherwise mentioned, the `.md` documentation file is labeled the same as the Lua file containin the code. For example, documentation of all the API functions introduced by `builtin.lua` can be found in `doc/builtin.md`. Below, an overview of each documentation can be found.
 
+## `modules.md`
+Non-API portions of digicompute are loaded as modules to allow them to be easily enabled or disabled. This documents the API for loading, configuring, and interacting with modules.
+
 ## `builtin.md`
 This documents the API introduced by `builtin.lua`. Mostly containing file interaction APIs, __builtin__ contains functions that don't fit elsewhere.
 

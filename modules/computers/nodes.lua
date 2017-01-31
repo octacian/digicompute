@@ -1,4 +1,4 @@
--- digicompute/computers.lua
+-- computers/nodes.lua
 
 digicompute.register_computer("default", {
 	description = "digicomputer",

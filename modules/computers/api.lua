@@ -1,4 +1,4 @@
--- digicompute/c_api.lua
+-- computers/api.lua
 
 digicompute.c = {}
 
