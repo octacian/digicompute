@@ -29,6 +29,8 @@ function digicompute.env()
   end
 
   local env = {
+    dump = dump,
+    type = type,
     string = {
       byte = string.byte,
       char = string.char,
