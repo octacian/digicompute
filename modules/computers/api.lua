@@ -508,6 +508,13 @@ function digicompute.c:make_env(pos, player)
   function fs.run(path)
     return digicompute.c:run_file(pos, player, path)
   end
+  -- [function] Settings
+  function main.Settings(path)
+    local fpath = cpath..path
+    if digicompute.builtin.exists(fpath) then
+      return Settings(fpath)
+    end
+  end
 
   -- Get default env table
 

@@ -84,6 +84,11 @@ Refresh the computer display, typically after making changes to a buffer, field,
 
 Run code under the environment (e.g. run data in the input field whenever it is submitted).
 
+#### `Settings(path)`
+__Usage:__ `Settings(<path (string)>)`
+
+Returns a userdata value containing a list of the "settings" defined in a file. Each setting should be on a new line, like variables but without `local` as a prefix. This "object" has several methods that you can use on it (e.g. `:to_table()`), however they are not documented here. Instead, see the methods section in the [documentation for node meta](http://dev.minetest.net/NodeMetaRef#Methods) as `Settings()` and node meta share the same methods.
+
 ## Filesystem
 This API section introduces function to interact with the computer's physical filesystem.
 
