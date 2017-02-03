@@ -36,7 +36,7 @@ local settings = Settings(modpath.."/modules.conf"):to_table()
 function digicompute.get_module_path(name)
   local module_path = modpath.."/modules/"..name
 
-  if digicompute.builtin.exists(module_path) then
+  if digicompute.builtin.exists(module_path.."/init.lua") then
     return module_path
   end
 end
@@ -44,18 +44,15 @@ end
 -- [function] Load module (overrides modules.conf)
 function digicompute.load_module(name)
   if loaded_modules[name] ~= false then
-    local module_path = digicompute.get_module_path(name)
+    local module_init = digicompute.get_module_path(name).."/init.lua"
 
-    if module_path then
-      if digicompute.builtin.exists(module_path.."/init.lua") then
-        dofile(module_path.."/init.lua")
-        loaded_modules[name] = true
-        return true
-      else
-        digicompute.log("Module ("..name..") missing init.lua, could not load", "error")
-      end
+    if module_init then
+      dofile(module_init)
+      loaded_modules[name] = true
+      return true
     else
-      digicompute.log("Invalid module \""..name.."\"", "error")
+      digicompute.log("Invalid module \""..name.."\". The module either does not exist "..
+        "or is missing an init.lua file.", "error")
     end
   else
     return true
