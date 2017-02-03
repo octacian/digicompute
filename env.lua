@@ -29,6 +29,9 @@ function digicompute.env()
   end
 
   local env = {
+    assert = assert,
+    pairs = pairs,
+    ipairs = ipairs,
     dump = dump,
     type = type,
     string = {
