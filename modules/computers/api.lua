@@ -291,7 +291,7 @@ function digicompute.c:deinit(pos, clear_entry)
       meta:get_string("owner").." at "..minetest.pos_to_string(pos))
 
       if digicompute.builtin.list(main_path..owner).subdirs then
-        os.remove(main_path..owner)
+        digicompute.builtin.rmdir(main_path..owner)
       end
   end
 

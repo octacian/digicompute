@@ -5,8 +5,7 @@ local builtin = digicompute.builtin
 
 -- [function] check if file exists
 function builtin.exists(path)
-  local f = io.open(path, "r") -- open file
-  if f ~= nil then f:close() return true end
+  if io.open(path, "r") then return true end
 end
 
 -- [function] list contents
@@ -14,10 +13,16 @@ function builtin.list(path)
   local files = minetest.get_dir_list(path, false)
   local subdirs = minetest.get_dir_list(path, true)
 
-  return {
-    files = files or nil,
-    subdirs = subdirs or nil,
+  local retval = {
+    files = files,
+    subdirs = subdirs,
   }
+
+  if not files and not subdirs then
+    retval = nil
+  end
+
+  return retval
 end
 
 -- [function] create file
@@ -43,6 +48,7 @@ function builtin.read(path)
   local f = io.open(path, "r") -- open file for reading
   if f then
     local data = f:read("*all") -- read and store all data
+    f:close() -- Close file
     return data -- return file contents
   end
 end
@@ -70,7 +76,7 @@ end
 
 -- [function] remove directory
 function builtin.rmdir(path)
-  if io.open(path) then
+  if builtin.list(path) then
     -- [local function] remove files
     local function rm_files(ppath, files)
       for _, f in ipairs(files) do
@@ -88,7 +94,17 @@ function builtin.rmdir(path)
           rm_dir(dpath.."/"..d)
         end
       end
-      os.remove(dpath)
+
+      local ok, msg = os.remove(dpath)
+      if not ok then
+        os.execute("rmdir "..dpath)
+      end
+    end
+
+    local len = path:len()
+
+    if path:sub(len, len) == "/" then
+      path = path:sub(1, -2)
     end
 
     rm_dir(path)
@@ -98,7 +114,7 @@ end
 
 -- [function] copy directory
 function builtin.cpdir(original, new)
-  if io.open(original) then
+  if builtin.list(original) then
     -- [local function] copy files
     local function copy_files(opath, npath, files)
       for _, f in ipairs(files) do
