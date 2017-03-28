@@ -1,3 +1,4 @@
 name = help
 description = Show help information
+params = [command / "all"]
 exec = os/exec/help.lua

@@ -16,6 +16,7 @@ for _,f in ipairs(bin_contents.files) do
 
   bin[name] = {
     description = cmd_info.description or "",
+    params = cmd_info.params or "",
     exec = cmd_info.exec or "os/exec/nil"
   }
 end

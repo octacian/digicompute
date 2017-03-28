@@ -1,3 +1,4 @@
 name = echo
 description = Print text to the command line
+params = [text]
 exec = os/exec/echo.lua

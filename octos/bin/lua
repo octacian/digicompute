@@ -1,3 +1,4 @@
 name = lua
 description = Execute Lua code
+params = [code]
 exec = os/exec/lua.lua
