@@ -4,6 +4,25 @@ set_os("off", "shutdown")
 set_os("reboot", "shutdown -r")
 set_os("prefix", get_attr("name")..":~$ ")
 
+-- Initialize bin table
+local bin = {}
+
+-- Load bin file
+local bin_contents = fs.list("os/bin")
+for _,f in ipairs(bin_contents.files) do
+  local fpath    = "os/bin/"..f
+  local cmd_info = Settings(fpath):to_table()
+  local name     = cmd_info.name or f
+
+  bin[name] = {
+    description = cmd_info.description or "",
+    exec = cmd_info.exec or "os/exec/nil"
+  }
+end
+
+-- Save bin table
+set_userdata("bin", bin)
+
 -- Set initial output value
 set_output("Welcome to octOS version 0.2.\n\n"..get_os("prefix")) -- print welcome
 

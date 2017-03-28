@@ -1,12 +1,25 @@
-local input = get_attr("input")
+local input = get_attr("input"):split(" ")
+local bin   = get_userdata("bin")
 
-if input ~= "" then
-  print(input, false) -- print input
+if input[1] ~= "" then
+  print(get_attr("input"), false)
 
-  local ok, res = run(input)
-  if res then print(res) end
+  local binentry = bin[input[1]]
 
-  print(get_os("prefix")) -- Print prefix
+  if binentry then
+    -- Remove first param
+    table.remove(input, 1)
+
+    fs.run(binentry.exec, input)
+  else
+    print(input[1]..": command not found")
+  end
+
+  print(get_os("prefix"))
+
+  -- Clear input
   set_input("")
-  refresh() -- refresh
+
+  -- Refresh view
+  refresh()
 end

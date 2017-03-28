@@ -95,7 +95,7 @@ function digicompute.env()
 end
 
 -- [function] run code
-function digicompute.run_code(code, env)
+function digicompute.run_code(code, env, ...)
   if code:byte(1) == 27 then
     return nil, "Binary code prohibited."
   end
@@ -114,15 +114,15 @@ function digicompute.run_code(code, env)
   debug.sethook(function()
     error("Code timed out!", 2)
   end, "", 10000)
-  local ok, ret = pcall(f)
+  local ok, ret = pcall(f, ...)
   debug.sethook()  -- Clear hook
   if not ok then return false, ret end
   return true, ret
 end
 
 -- [function] run file
-function digicompute.run_file(path, env)
+function digicompute.run_file(path, env, ...)
   local code = digicompute.builtin.read(path)
-  local ok, res = digicompute.run_code(code, env)
+  local ok, res = digicompute.run_code(code, env, ...)
   return ok, res
 end

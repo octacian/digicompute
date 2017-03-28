@@ -1,5 +1,5 @@
-# Computer OS API
-This API can be used by players to interact with the computer under a safe and secure environment. The documentation is divided into two sections as is the code, main (for general functions), and filesystem (for filesystem access).
+# OctOS
+OctOS is the operating system used by digicomputers. OctOS is made of many Linux-like commands which are documented in `commands.md`, however, there is also an API which can be used when writing programs for OctOS. The API can be used by players to interact with the computer under a safe and secure environment. The documentation is divided into two sections as is the code, main (for general functions), and filesystem (for filesystem access).
 
 ## Main
 This contains a set of functions mainly for the purpose of interacting with the computer's displays.

@@ -439,7 +439,8 @@ function digicompute.c:make_env(pos, player)
   end
   -- [function] get userdata value
   function main.get_userdata(key)
-    return minetest.deserialize(meta:get_string("userdata"))[key] or nil
+    local res = meta:get_string("userdata")
+    return minetest.deserialize(res)[key] or nil
   end
   -- [function] set userdata value
   function main.set_userdata(key, value)
@@ -452,8 +453,12 @@ function digicompute.c:make_env(pos, player)
     return digicompute.c:open(pos, minetest.get_player_by_name(meta:get_string("current_user")))
   end
   -- [function] run code
-  function main.run(code)
-    return digicompute.c:run_code(pos, player, code)
+  function main.run(code, ...)
+    return digicompute.c:run_code(pos, player, code, ...)
+  end
+  -- [function] loadstring
+  function main.loadstring(string)
+    return loadstring(string)
   end
 
   -- Filesystem Environment Functions
@@ -505,8 +510,8 @@ function digicompute.c:make_env(pos, player)
     return digicompute.builtin.cpdir(cpath..original, cpath..new)
   end
   -- [function] run file
-  function fs.run(path)
-    return digicompute.c:run_file(pos, player, path)
+  function fs.run(path, ...)
+    return digicompute.c:run_file(pos, player, path, ...)
   end
   -- [function] Settings
   function main.Settings(path)
@@ -530,17 +535,17 @@ function digicompute.c:make_env(pos, player)
 end
 
 -- [function] run code
-function digicompute.c:run_code(pos, player, code)
+function digicompute.c:run_code(pos, player, code, ...)
   local env     = digicompute.c:make_env(pos, player)
-  local ok, res = digicompute.run_code(code, env)
+  local ok, res = digicompute.run_code(code, env, ...)
   return ok, res
 end
 
 -- [function] run file
-function digicompute.c:run_file(pos, player, path)
+function digicompute.c:run_file(pos, player, path, ...)
   local path    = minetest.get_meta(pos):get_string("path")..path
   local env     = digicompute.c:make_env(pos, player)
-  local ok, res = digicompute.run_file(path, env)
+  local ok, res = digicompute.run_file(path, env, ...)
   return ok, res
 end
 
@@ -570,7 +575,7 @@ function digicompute.register_computer(itemstring, def)
       meta:set_string("input", "")                               -- Initialize input buffer
       meta:set_string("output", "")                              -- Initialize output buffer
       meta:set_string("os", "")                                  -- Initialize OS table
-      meta:set_string("userspace", "")                           -- Initialize userspace table
+      meta:set_string("userdata", "")                           -- Initialize userdata table
       meta:set_string("help", "Type a command and press enter.") -- Initialize help
       digicompute.c:new_id(pos)                                  -- Set up ID
 

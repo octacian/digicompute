@@ -1,0 +1,3 @@
+name = lua
+description = Execute Lua code
+exec = os/exec/lua.lua
