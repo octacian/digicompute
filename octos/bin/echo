@@ -1,0 +1,3 @@
+name = echo
+description = Print text to the command line
+exec = os/exec/echo.lua
