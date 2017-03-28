@@ -1,8 +1,8 @@
 local params = ...
 local code = (table.concat(params, " "))
 
-local res = run(code)
+local ok, res = run(code)
 
-if not res then
-  print("Error: Could not run `"..code.."`")
+if not ok then
+  print("Error: "..res)
 end

@@ -10,7 +10,11 @@ if input[1] ~= "" then
     -- Remove first param
     table.remove(input, 1)
 
-    fs.run(binentry.exec, input)
+    local ok, res = fs.run(binentry.exec, input)
+
+    if not ok then
+      print("Error: "..res)
+    end
   else
     print(input[1]..": command not found")
   end
