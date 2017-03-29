@@ -1,0 +1,4 @@
+name = rmdir
+description = Remove directory
+params = [path]
+exec = os/exec/rmdir.lua

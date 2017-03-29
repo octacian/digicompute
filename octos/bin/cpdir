@@ -1,0 +1,4 @@
+name = cpdir
+description = Copy directory
+params = [original path] [copy path]
+exec = os/exec/cpdir.lua

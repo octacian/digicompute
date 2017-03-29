@@ -1,0 +1,4 @@
+name = mkdir
+description = Create directory
+params = [path]
+exec = os/exec/mkdir.lua
