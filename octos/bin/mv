@@ -1,0 +1,4 @@
+name = mv
+description = Move a file or directory
+params = [old path] [new path]
+exec = os/exec/mv.lua

@@ -16,7 +16,7 @@ Create new file.
 #### `rm [path]`
 Remove file.
 
-#### `cp [old path] [copy path]`
+#### `cp [original path] [copy path]`
 Make a copy of a file.
 
 #### `mkdir [path]`
@@ -25,5 +25,8 @@ Create new directory.
 #### `rmdir [path]`
 Remove directory.
 
-#### `cpdir [old path] [copy path]`
+#### `cpdir [original path] [copy path]`
 Make a copy of a directory.
+
+#### `mv [old path] [new path]`
+Move a file or directory to a new location.
