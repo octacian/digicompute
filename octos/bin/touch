@@ -1,0 +1,4 @@
+name = touch
+description = Create a file
+params = [path]
+exec = os/exec/touch.lua

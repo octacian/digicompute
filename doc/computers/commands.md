@@ -9,3 +9,12 @@ Runs Lua code from the command line under the secure environment.
 
 #### `echo [text]`
 Print text to the command line.
+
+#### `touch [path]`
+Create new file.
+
+#### `rm [path]`
+Remove file.
+
+#### `cp [old path] [new path]`
+Make a copy of a file.

@@ -1,0 +1,4 @@
+name = rm
+description = Remove file
+params = [path]
+exec = os/exec/rm.lua

@@ -1,0 +1,4 @@
+name = cp
+description = Copy file
+params = [original path] [copy path]
+exec = os/exec/cp.lua
