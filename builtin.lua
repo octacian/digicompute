@@ -67,8 +67,10 @@ function builtin.mkdir(path)
   if not io.open(path) then
     if minetest.mkdir then
       minetest.mkdir(path) -- create directory if minetest.mkdir is available
-    else
+    elseif os.execute then
       os.execute('mkdir "'..path..'"') -- create directory with os mkdir command
+		else
+			return false
     end
     return true
   end
@@ -97,7 +99,9 @@ function builtin.rmdir(path)
 
       local ok, msg = os.remove(dpath)
       if not ok then
-        os.execute("rmdir "..dpath)
+				if os.execute then
+        	os.execute("rmdir "..dpath)
+				end
       end
     end
 
