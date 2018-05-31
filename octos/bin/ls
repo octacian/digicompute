@@ -1,0 +1,4 @@
+name = ls
+description = List the contents of a directory
+params = [path]
+exec = os/exec/ls.lua

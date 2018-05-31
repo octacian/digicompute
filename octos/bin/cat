@@ -1,0 +1,4 @@
+name = cat
+description = Print the contents of a file
+params = [path]
+exec = os/exec/cat.lua
