@@ -79,10 +79,10 @@ Stores any piece of information in the non-persistant userdata table. (Table is 
 
 Refresh the computer display, typically after making changes to a buffer, field, or other element.
 
-#### `run(code)`
-**Usage:** `run(<code (string)>)`
+#### `run(code, ...)`
+**Usage:** `run(<code (string)>, <additional parameters>)`
 
-Run code under the environment (e.g. run data in the input field whenever it is submitted).
+Run code under the environment (e.g. run data in the input field whenever it is submitted). Returns two parameters, the first representing success and the second being `nil` unless the operation was not successful, in which case it contains an error message. Any number of additional parameters can be provided after the path, to be accessed by the code being run.
 
 #### `set_run(path)`
 __Usage:__ `set_run(<file path (string)>)`
@@ -122,6 +122,11 @@ __Usage:__ `fs.read(<path (string)>)`
 
 Attempts to read entire file. If `nil` is returned, the file does not exist, otherwise, the file contents will be returned.
 
+#### `list(path)`
+__Usage:__ `fs.list(<path (string)>)`
+
+Lists the contents of a directory specified by `path`. Returns a table containing two subtables, `files` and `subdirs`. If there are no file or subdirectories, or if the path point to a file rather than a directory, these two subtables will both be empty.
+
 #### `copy(original_path, new_path)`
 __Usage:__ `fs.copy(<original path (string)>, <new path> (string)`
 
@@ -141,3 +146,8 @@ Recursively removes a directory if it exists. Returns `true` if successful. __No
 __Usage:__ `fs.cpdir(<original path (string)>, <new path (string)>`
 
 Recursively copies a directory and all it's sub-directories and files. Returns `true` if successful. __Note:__ depending on the size of the original directory, this may take some time.
+
+#### `run(path, ...)`
+__Usage:__ `fs.run(<path to file (string)>, <additional paramters>)`
+
+Attempts to read the contents of a file, treating it as Lua code to be run under the environment. Returns two parameters, the first representing success and the second being `nil` unless the operation was not successful, in which case it contains an error message. Any number of additional parameters can be provided after the path, to be accessed by the code being run.

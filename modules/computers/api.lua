@@ -460,10 +460,6 @@ function digicompute.c:make_env(pos, player)
 	function main.run(code, ...)
 		return digicompute.c:run_code(pos, player, code, ...)
 	end
-	-- [function] loadstring
-	function main.loadstring(string)
-		return loadstring(string)
-	end
 	-- [function] set file to be run when input is submitted
 	function main.set_run(run_path)
 		if run_path then
