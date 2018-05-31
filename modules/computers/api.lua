@@ -100,6 +100,7 @@ digicompute.c.forms = {
 					meta:set_string("name", fields.name)
 					meta:set_string("setup", "true")
 					meta:set_string("path", main_path..meta:get_string("owner").."/"..meta:get_string("id").."/")
+					meta:set_string("run", "os/main.lua") -- Set default run file
 					digicompute.c:init(pos)
 					digicompute.c:open(pos, player)
 				else
@@ -158,9 +159,14 @@ digicompute.c.forms = {
 				else -- else, turn over to os
 					-- Set meta value(s)
 					meta:set_string("input", fields.input)
+					if fields.output then
+						meta:set_string("output", fields.output)
+					end
 
-					-- Run main.lua
-					digicompute.c:run_file(pos, player, "os/main.lua") -- Run main
+					local run = meta:get_string("run")
+					if run == "" then run = "os/main.lua" end
+					-- Get and run current "run file" (default: os/main.lua)
+					digicompute.c:run_file(pos, player, run)
 				end
 			end
 		end,
@@ -359,6 +365,7 @@ end
 function digicompute.c:make_env(pos, player)
 	assert(pos, "digicompute.c:make_env missing position")
 	local meta = minetest.get_meta(pos)
+	local cpath = meta:get_string("path")
 
 	-- Main Environment Functions
 
@@ -457,11 +464,20 @@ function digicompute.c:make_env(pos, player)
 	function main.loadstring(string)
 		return loadstring(string)
 	end
+	-- [function] set file to be run when input is submitted
+	function main.set_run(run_path)
+		if run_path then
+			if digicompute.builtin.exists(cpath..run_path) then
+				meta:set_string("run", run_path)
+			end
+		else
+			meta:set_string("run", "os/main.lua")
+		end
+	end
 
 	-- Filesystem Environment Functions
 
-	local fs    = {}
-	local cpath = meta:get_string("path")
+	local fs = {}
 
 	-- [function] exists
 	function fs.exists(internal_path)

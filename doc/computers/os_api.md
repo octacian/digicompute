@@ -84,6 +84,11 @@ Refresh the computer display, typically after making changes to a buffer, field,
 
 Run code under the environment (e.g. run data in the input field whenever it is submitted).
 
+#### `set_run(path)`
+__Usage:__ `set_run(<file path (string)>)`
+
+Set the file that is to be run when text in the input bar is submitted. Defaults to `os/main.lua`. If the `path` parameter is not provided, the run file will be reset to the default.
+
 #### `Settings(path)`
 __Usage:__ `Settings(<path (string)>)`
 

@@ -113,7 +113,7 @@ function digicompute.run_code(code, env, ...)
 	-- after 10000 events
 	debug.sethook(function()
 		error("Code timed out!", 2)
-	end, "", 10000)
+	end, "", 100000)
 	local ok, ret = pcall(f, ...)
 	debug.sethook()  -- Clear hook
 	if not ok then return false, ret end

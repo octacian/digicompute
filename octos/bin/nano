@@ -1,0 +1,4 @@
+name = nano
+description = Edit or create a file
+params = [path]
+exec = os/exec/nano.lua

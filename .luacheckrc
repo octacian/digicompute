@@ -22,5 +22,5 @@ read_globals = {
 	"set_help", "get_attr", "get_output", "set_output",
 	"set_output_editable", "get_input", "set_input",
 	"get_os", "set_os", "get_userdata", "set_userdata",
-	"refresh", "run", "loadstring", "fs",
+	"refresh", "run", "loadstring", "set_run", fs",
 }
