@@ -77,7 +77,7 @@ Stores any piece of information in the non-persistant userdata table. (Table is 
 #### `refresh()`
 **Usage:** `refresh()`
 
-Refresh the computer display, typically after making changes to a buffer, field, or other element.
+Refresh the computer display, typically after making changes to a buffer, field, or other element. If `nil` is returned rather than `true`, you have been somehow disconnected from the computer as being the current user (e.g. somebody manually edited the `current_user` meta field); the problem can be solved by simply closing and reopening the formspec manually.
 
 #### `run(code, ...)`
 **Usage:** `run(<code (string)>, <additional parameters>)`

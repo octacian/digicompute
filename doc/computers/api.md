@@ -96,7 +96,7 @@ digicompute.c.forms = {
   newformname = {
     cache_formname = true/false,
     get = function(pos, player) ... end,
-    handle = function(pos, player, fields) ... end,    
+    handle = function(pos, player, fields) ... end,
   },
   ...
 }
@@ -171,10 +171,10 @@ Deinitializes a computers filesystem. The entry in the computers table is also c
 
 Reinitializes the filesystem of a computer by calling `c:deinit` followed by `c:init`. **Note:** this is destructive and will wipe any files created or changed by the player.
 
-#### `c:on(pos, player)`
-**Usage:** `digicompute.c:on(<computer position (table)>, <player (userdata value)>`
+#### `c:on(pos)`
+**Usage:** `digicompute.c:on(<computer position (table)>)`
 
-Turns a computer on (will not execute if computer is not off). `start.lua` is automatically run, hence the player userdata is required.
+Turns a computer on (will not execute if computer is not off). `start.lua` is run upon the next right-click, when the main formspec is launched.
 
 #### `c:off(pos, player)`
 **Usage:** `digicompute.c:off(<computer position (table)>, <player (userdata value)>`
@@ -189,17 +189,17 @@ Reboots a computer by calling `c:off` followed by `c:on`.
 ### Environment
 This section introduces functions to initialize the environment per-computer and execute a string or file under the environment.
 
-#### `c:make_env(pos, player)`
+#### `c:make_env(pos)`
 **Usage:** `digicompute.c:make_env(<computer position (table)>, <player (userdata value)>`
 
-Returns a table of functions allowed under the environment. The table is made up of a wide array of functions for interacting with the computer and its file system. These are joined with the table returned by `digicompute.env()`, explaned in `env.md`. The player userdata parameter is required for later callbacks to functions such as `c:open`.
+Returns a table of functions allowed under the environment. The table is made up of a wide array of functions for interacting with the computer and its file system. These are joined with the table returned by `digicompute.env()`, explaned in `env.md`.
 
-#### `c:run_code(pos, player, code)`
-**Usage:** `digicompute.c:run_code(<computer position (table)>, <player (userdata value)>, <code (string)>)`
+#### `c:run_code(pos, code)`
+**Usage:** `digicompute.c:run_code(<computer position (table)>, <code (string)>)`
 
-Generates an environment table using `c:make_env` and runs the code (provided as third parameter) with `digicompute.run_code` (see `env.md`).
+Generates an environment table using `c:make_env` and runs the code (provided as the second parameter) with `digicompute.run_code` (see `env.md`).
 
-#### `c:run_file(pos, player, path)`
+#### `c:run_file(pos, path)`
 **Usage:** `digicompute.c:run_file(<computer position (table)>, <player (userdata value)>, <path (string)>)`
 
-Generates an environment table using `c:make_env` and runs the code found in the file specified by `path` with `digicompute.run_file` (see `env.md`). **Note:** the path is relative to the computer, meaning that `main.lua` could be run with `digicompute.c:run_file(pos, player, "os/main.lua")`.
+Generates an environment table using `c:make_env` and runs the code found in the file specified by `path` with `digicompute.run_file` (see `env.md`). **Note:** the path is relative to the computer, meaning that `main.lua` could be run with `digicompute.c:run_file(pos, "os/main.lua")`.

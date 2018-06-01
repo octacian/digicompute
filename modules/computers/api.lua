@@ -8,6 +8,21 @@ local main_path = path.."computers/"
 -- Make computer directory
 digicompute.builtin.mkdir(main_path)
 
+-----------------------------
+-- CURRENT USER MANAGEMENT --
+-----------------------------
+
+local current_users = {}
+
+-- [event] remove current users on leave
+minetest.register_on_leaveplayer(function(player)
+	local name = player:get_player_name()
+	if current_users[name] then
+		minetest.get_meta(current_users[name]):set_string("current_user", nil)
+		current_users[name] = nil
+	end
+end)
+
 -------------------
 -- ID MANAGEMENT --
 -------------------
@@ -114,6 +129,15 @@ digicompute.c.forms = {
 	main = {
 		get = function(pos)
 			local meta     = minetest.get_meta(pos)
+
+			local last_start = meta:get_int("last_run_start")
+			if last_start == 0 or last_start < meta:get_int("last_boot") then
+				if meta:get_string("setup") == "true" then
+					meta:set_int("last_run_start", os.time())
+					digicompute.c:run_file(pos, "os/start.lua")
+				end
+			end
+
 			local input    = minetest.formspec_escape(meta:get_string("input"))
 			local help     = minetest.formspec_escape(meta:get_string("help"))
 			local output   = meta:get_string("output")
@@ -166,7 +190,7 @@ digicompute.c.forms = {
 					local run = meta:get_string("run")
 					if run == "" then run = "os/main.lua" end
 					-- Get and run current "run file" (default: os/main.lua)
-					digicompute.c:run_file(pos, player, run)
+					digicompute.c:run_file(pos, run)
 				end
 			end
 		end,
@@ -204,30 +228,39 @@ digicompute.c.forms = {
 -- [function] open formspec
 function digicompute.c:open(pos, player, formname)
 	local meta = minetest.get_meta(pos)
+	local user = meta:get_string("current_user")
+	local name = player:get_player_name()
 
-	if meta:get_string("setup") == "true" then
-		local meta_formname = meta:get_string("formname")
+	if user == "" or user == name then
+		if meta:get_string("setup") == "true" then
+			local meta_formname = meta:get_string("formname")
 
-		if not formname and meta_formname and meta_formname ~= "" then
-			formname = meta_formname
+			if not formname and meta_formname and meta_formname ~= "" then
+				formname = meta_formname
+			end
+		else
+			formname = "naming"
+		end
+
+		formname   = formname or "main"
+		local form = digicompute.c.forms[formname]
+
+		if form then
+			if form.cache_formname ~= false then
+				meta:set_string("formname", formname)
+			end
+
+			-- Add current user
+			meta:set_string("current_user", name)
+			current_users[name] = pos
+
+			computer_contexts[name] = minetest.get_meta(pos):get_string("id")
+			minetest.show_formspec(name, "digicompute:"..formname, form.get(pos, player))
+			return true
 		end
 	else
-		formname = "naming"
-	end
-
-	formname   = formname or "main"
-	local form = digicompute.c.forms[formname]
-
-	if form then
-		local name = player:get_player_name()
-
-		if form.cache_formname ~= false then
-			meta:set_string("formname", formname)
-		end
-
-		computer_contexts[name] = minetest.get_meta(pos):get_string("id")
-		minetest.show_formspec(name, "digicompute:"..formname, form.get(pos, player))
-		return true
+		minetest.chat_send_player(name, minetest.colorize("red", "This computer is " ..
+			"already in use by "..user))
 	end
 end
 
@@ -240,7 +273,13 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
 		if computer then
 			local pos = computer.pos
-			minetest.get_meta(pos):set_string("current_user", player:get_player_name())
+
+			-- if formspec quit, remove current user
+			if fields.quit == "true" then
+				minetest.get_meta(pos):set_string("current_user", nil)
+				current_users[player:get_player_name()] = nil
+			end
+
 			digicompute.c.forms[formname[2]].handle(pos, player, fields)
 		else
 			minetest.chat_send_player(player:get_player_name(), "Computer could not be found!")
@@ -275,7 +314,6 @@ function digicompute.c:init(pos)
 		digicompute.builtin.mkdir(main_path..meta:get_string("owner"))
 		digicompute.builtin.mkdir(new_path)
 		digicompute.builtin.cpdir(digicompute.modpath.."/octos/", new_path.."os")
-		digicompute.c:run_file(pos, meta:get_string("owner"), "os/start.lua")
 		digicompute.log("Initialized computer "..meta:get_string("id").." owned by "..
 			meta:get_string("owner").." at "..minetest.pos_to_string(pos))
 		digicompute.c:infotext(pos)
@@ -311,7 +349,7 @@ function digicompute.c:reinit(pos)
 end
 
 -- [function] turn computer on
-function digicompute.c:on(pos, player)
+function digicompute.c:on(pos)
 	local temp = minetest.get_node(pos)
 	local ddef = minetest.registered_nodes[temp.name].digicompute
 	if ddef.state == "off" then
@@ -329,10 +367,9 @@ function digicompute.c:on(pos, player)
 
 			-- Update infotext
 			digicompute.c:infotext(pos)
-			-- Run start if setup
-			if minetest.get_meta(pos):get_string("setup") == "true" then
-				digicompute.c:run_file(pos, player, "os/start.lua")
-			end
+			-- Set last boot to the current time for later use on_rightclick to
+			-- check if os/start.lua should be run
+			minetest.get_meta(pos):set_int("last_boot", os.time())
 		end, vector.new(pos))
 	end
 end
@@ -345,8 +382,10 @@ function digicompute.c:off(pos, player)
 	minetest.swap_node({x = pos.x, y = pos.y, z = pos.z}, {name = offname, param2 = temp.param2})
 	-- Update infotext
 	digicompute.c:infotext(pos)
-	-- Update Formspec
-	minetest.close_formspec(player:get_player_name(), "")
+	-- Close formspec if player object is provided
+	if player and player.get_player_name then
+		minetest.close_formspec(player:get_player_name(), "")
+	end
 	-- Clear update buffer
 	minetest.get_meta(pos):set_string("output", "")
 end
@@ -354,7 +393,7 @@ end
 -- [function] reboot computer
 function digicompute.c:reboot(pos, player)
 	digicompute.c:off(pos, player)
-	digicompute.c:on(pos, player)
+	digicompute.c:on(pos)
 end
 
 -----------------------
@@ -362,7 +401,7 @@ end
 -----------------------
 
 -- [function] Make environment
-function digicompute.c:make_env(pos, player)
+function digicompute.c:make_env(pos)
 	assert(pos, "digicompute.c:make_env missing position")
 	local meta = minetest.get_meta(pos)
 	local cpath = meta:get_string("path")
@@ -454,11 +493,17 @@ function digicompute.c:make_env(pos, player)
 	end
 	-- [function] refresh
 	function main.refresh()
-		return digicompute.c:open(pos, minetest.get_player_by_name(meta:get_string("current_user")))
+		local current_user = meta:get_string("current_user")
+		if current_user ~= "" then
+			local player = minetest.get_player_by_name(current_user)
+			if player then
+				return digicompute.c:open(pos, player)
+			end
+		end
 	end
 	-- [function] run code
 	function main.run(code, ...)
-		return digicompute.c:run_code(pos, player, code, ...)
+		return digicompute.c:run_code(pos, code, ...)
 	end
 	-- [function] set file to be run when input is submitted
 	function main.set_run(run_path)
@@ -520,7 +565,7 @@ function digicompute.c:make_env(pos, player)
 	end
 	-- [function] run file
 	function fs.run(internal_path, ...)
-		return digicompute.c:run_file(pos, player, internal_path, ...)
+		return digicompute.c:run_file(pos, internal_path, ...)
 	end
 	-- [function] Settings
 	function main.Settings(internal_path)
@@ -544,16 +589,16 @@ function digicompute.c:make_env(pos, player)
 end
 
 -- [function] run code
-function digicompute.c:run_code(pos, player, code, ...)
-	local env     = digicompute.c:make_env(pos, player)
+function digicompute.c:run_code(pos, code, ...)
+	local env     = digicompute.c:make_env(pos)
 	local ok, res = digicompute.run_code(code, env, ...)
 	return ok, res
 end
 
 -- [function] run file
-function digicompute.c:run_file(pos, player, internal_path, ...)
+function digicompute.c:run_file(pos, internal_path, ...)
 	local complete_path = minetest.get_meta(pos):get_string("path")..internal_path
-	local env           = digicompute.c:make_env(pos, player)
+	local env           = digicompute.c:make_env(pos)
 	local ok, res       = digicompute.run_file(complete_path, env, ...)
 	return ok, res
 end
@@ -592,7 +637,7 @@ function digicompute.register_computer(itemstring, def)
 			digicompute.c:infotext(pos)
 		end,
 		on_rightclick = function(pos, node, player)
-			digicompute.c:on(pos, player)
+			digicompute.c:on(pos)
 		end,
 		on_destruct = function(pos)
 			if minetest.get_meta(pos):get_string("name") then
