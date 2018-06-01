@@ -21,6 +21,11 @@ for _,f in ipairs(bin_contents.files) do
 	}
 end
 
+-- Add additional commands to bin
+bin[get_os("clear")] = { description = "Clear the shell output" } -- Clear shell output
+bin[get_os("off")] = { description = "Turn off computer" } -- Turn off computer
+bin[get_os("reboot")] = { description = "Reboot computer" } -- Reboot computer
+
 -- Save bin table
 set_userdata("bin", bin)
 

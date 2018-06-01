@@ -162,7 +162,7 @@ digicompute.c.forms = {
 	},
 	main = {
 		get = function(pos)
-			local meta     = minetest.get_meta(pos)
+			local meta = minetest.get_meta(pos)
 
 			local last_start = meta:get_int("last_run_start")
 			if last_start == 0 or last_start < meta:get_int("last_boot") then
@@ -254,6 +254,10 @@ digicompute.c.forms = {
 
 				-- Reset Filesystem
 				digicompute.c:reinit(pos)
+
+				-- Rerun start.lua
+				meta:set_int("last_run_start", os.time())
+				digicompute.c:run_file(pos, "os/start.lua")
 			end
 		end,
 	},
