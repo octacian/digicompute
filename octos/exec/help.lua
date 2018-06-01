@@ -1,8 +1,8 @@
 -- cmd: help --
 
 local params = ...
-local bin    = get_userdata("bin")
 local param  = params[1]
+local bin = ram.bin
 
 --[local function] Sort the help list alphabetically
 local function sort(list)

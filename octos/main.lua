@@ -1,5 +1,5 @@
 local input = get_attr("input"):split(" ")
-local bin   = get_userdata("bin")
+local bin = ram.bin
 
 if input[1] ~= "" then
 	print(get_attr("input"), false)

@@ -5,6 +5,8 @@ digicompute.c = {}
 local path      = digicompute.path
 local main_path = path.."computers/"
 
+local environments = {}
+
 -- Make computer directory
 digicompute.builtin.mkdir(main_path)
 
@@ -374,8 +376,13 @@ function digicompute.c:deinit(pos, clear_entry)
 			end
 	end
 
+	local id = meta:get_string("id")
+	-- Remove saved environment
+	if environments[id] then
+		environments[id] = nil
+	end
+
 	if clear_entry ~= false then
-		local id = meta:get_string("id")
 		computers[id] = nil
 	end
 end
@@ -429,6 +436,7 @@ end
 function digicompute.c:off(pos, player)
 	local temp = minetest.get_node(pos) -- Get basic node information
 	local offname = "digicompute:"..minetest.registered_nodes[temp.name].digicompute.base
+	local meta = minetest.get_meta(pos)
 	-- Swap node to off
 	minetest.swap_node({x = pos.x, y = pos.y, z = pos.z}, {name = offname, param2 = temp.param2})
 	-- Update infotext
@@ -437,8 +445,13 @@ function digicompute.c:off(pos, player)
 	if player and player.get_player_name then
 		minetest.close_formspec(player:get_player_name(), "")
 	end
-	-- Clear update buffer
-	minetest.get_meta(pos):set_string("output", "")
+	-- Clear output buffer
+	meta:set_string("output", "")
+	-- Reset environment
+	local id = meta:get_string("id")
+	if environments[id] then
+		environments[id] = nil
+	end
 end
 
 -- [function] reboot computer
@@ -455,6 +468,13 @@ end
 function digicompute.c:make_env(pos)
 	assert(pos, "digicompute.c:make_env missing position")
 	local meta = minetest.get_meta(pos)
+	local id = meta:get_string("id")
+
+	-- if an environment for this computer has already been generated, return it instead
+	if environments[id] then
+		return environments[id]
+	end
+
 	local cpath = meta:get_string("path")
 
 	-- Main Environment Functions
@@ -484,7 +504,7 @@ function digicompute.c:make_env(pos)
 	end
 	-- [function] get attribute
 	function main.get_attr(key)
-		return meta:get_string(key) or nil
+		return meta:to_table().fields[key] or nil
 	end
 	-- [function] get output
 	function main.get_output()
@@ -530,17 +550,6 @@ function digicompute.c:make_env(pos)
 		else
 			return false
 		end
-	end
-	-- [function] get userdata value
-	function main.get_userdata(key)
-		local res = meta:get_string("userdata")
-		return minetest.deserialize(res)[key] or nil
-	end
-	-- [function] set userdata value
-	function main.set_userdata(key, value)
-		local table = minetest.deserialize(meta:get_string("userdata")) or {}
-		table[key] = value
-		return meta:set_string("userdata", minetest.serialize(table))
 	end
 	-- [function] refresh
 	function main.refresh()
@@ -636,7 +645,10 @@ function digicompute.c:make_env(pos)
 		env[k] = v
 	end
 
-	return env
+	env.ram = {} -- RAM table, replacement for userdata
+
+	environments[id] = env
+	return environments[id]
 end
 
 -- [function] run code
@@ -680,8 +692,8 @@ function digicompute.register_computer(itemstring, def)
 			meta:set_string("input", "")                               -- Initialize input buffer
 			meta:set_string("output", "")                              -- Initialize output buffer
 			meta:set_string("os", "")                                  -- Initialize OS table
-			meta:set_string("userdata", "")                           -- Initialize userdata table
 			meta:set_string("help", "Type a command and press enter.") -- Initialize help
+			meta:set_string("output_editable", "false")                -- Initialize uneditable output
 			digicompute.c:new_id(pos)                                  -- Set up ID
 
 			-- Update infotext

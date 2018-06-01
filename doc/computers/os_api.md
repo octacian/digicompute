@@ -1,6 +1,10 @@
 # OctOS
 OctOS is the operating system used by digicomputers. OctOS is made of many Linux-like commands which are documented in `commands.md`, however, there is also an API which can be used when writing programs for OctOS. The API can be used by players to interact with the computer under a safe and secure environment. The documentation is divided into two sections as is the code, main (for general functions), and filesystem (for filesystem access).
 
+## Accessing the RAM (userdata)
+
+In earlier versions of digicompute, a RAM-like storage mechanism could be accessed with a `get_userdata` and `set_userdata` API. However, this API was later removed and instead the RAM is accessed by setting values of the `ram` table within the environment. Data can also be preserved by setting a global variable within the environment, however, use of the `ram` table is recommended. This is because of how digicompute handles the environments in the background. Global variables, including the `ram` table, are stored within the environment itself, and with the environment being preserved until the computer is shut off or deinitialized, the variables are preserved as well.  Please note that digicompute does not currently have a completely accurate representation of RAM, in that there is no limitation to the amount of data that can be stored.
+
 ## Main
 This contains a set of functions mainly for the purpose of interacting with the computer's displays.
 
@@ -23,6 +27,9 @@ Gets a piece of global information from the node meta (storage). Several common 
 * `input`: input field.
 * `output`: output buffer.
 * `name`: computer name.
+* `help`: formspec help text.
+* `id`: computer id.
+* `output_editable`: whether the output buffer is editable.
 
 #### `get_output()`
 **Usage:** `get_output()`
@@ -63,16 +70,6 @@ Sets a piece of information stored in the OS table. This table stores basic valu
 * `off`: command to turn the computer off.
 * `reboot`: command to reboot the computer.
 * `prefix`: prefix printed at the beginning of a new line.
-
-#### `get_userdata(key)`
-**Usage:** `get_userdata(<data name (string)>)`
-
-Gets a piece of information from the userdata table. This table is like RAM, as information will be reset when the computer is turned off.
-
-#### `set_userdata(key, value)`
-**Usage:** `set_userdata(<data name (string)>, <value>`
-
-Stores any piece of information in the non-persistant userdata table. (Table is cleared when computer is turned off, therefore non-persistant.)
 
 #### `refresh()`
 **Usage:** `refresh()`

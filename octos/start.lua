@@ -27,7 +27,7 @@ bin[get_os("off")] = { description = "Turn off computer" } -- Turn off computer
 bin[get_os("reboot")] = { description = "Reboot computer" } -- Reboot computer
 
 -- Save bin table
-set_userdata("bin", bin)
+ram.bin = bin
 
 -- Set initial output value
 set_output("Welcome to octOS version 0.2.\n\n"..get_os("prefix")) -- print welcome
