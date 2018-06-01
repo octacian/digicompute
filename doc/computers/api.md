@@ -171,6 +171,11 @@ Deinitializes a computers filesystem. The entry in the computers table is also c
 
 Reinitializes the filesystem of a computer by calling `c:deinit` followed by `c:init`. **Note:** this is destructive and will wipe any files created or changed by the player.
 
+#### `c:complete_boot(pos, index, name, param2)`
+__Usage:__ `digicompute.c:complete_boot(<computer position (table)>, <computer ID (number)>, <base computer itemstring (string)>, <param2 value of computer (number)>)`
+
+Completes the boot process of a computer by swapping the BIOS version of the computer node to the "on" version. This function should rarely be used, and currently is called only by `digicompute.c:on` inside a `minetest.after` which delays the boot completion by two seconds, and by the coroutine ensuring that all mid-boot computers complete the boot process even after Minetest restarts.
+
 #### `c:on(pos)`
 **Usage:** `digicompute.c:on(<computer position (table)>)`
 

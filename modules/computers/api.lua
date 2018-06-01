@@ -73,6 +73,40 @@ end
 -- [event] save computers on shutdown
 minetest.register_on_shutdown(digicompute.save_computers)
 
+----------------------------------
+-- MID-BOOT COMPUTER MANAGEMENT --
+----------------------------------
+
+-- Loop through all computers in a coroutine and check if
+-- any were left in the midst of the boot process
+local check_booting = coroutine.create(function()
+	-- [function] Get node
+	local function get_node(pos)
+		local node = minetest.get_node_or_nil(pos)
+		if node then return node end
+		minetest.get_voxel_manip(pos, pos)
+		return minetest.get_node(pos)
+	end
+
+	for id, c in pairs(computers) do
+		if c.booting then
+			local temp = get_node(c.pos)
+			local ddef = minetest.registered_nodes[temp.name].digicompute
+			if ddef.state == "off" or ddef.state == "bios" then
+				local name, param2 = "digicompute:"..ddef.base, temp.param2
+				digicompute.c:complete_boot(c.pos, id, name, param2)
+			else
+				c.booting = nil
+			end
+		end
+	end
+end)
+
+-- Start coroutine
+minetest.after(0, function()
+	coroutine.resume(check_booting)
+end)
+
 -------------------
 ---- FORMSPECS ----
 -------------------
@@ -348,6 +382,20 @@ function digicompute.c:reinit(pos)
 	digicompute.c:init(pos)
 end
 
+-- [function] complete computer boot process (swap from bios to on)
+function digicompute.c:complete_boot(pos, index, name, param2)
+	minetest.swap_node({x = pos.x, y = pos.y, z = pos.z}, {name = name.."_on", param2 = param2})
+
+	-- Remove computer booting tag
+	computers[index].booting = nil
+
+	-- Update infotext
+	digicompute.c:infotext(pos)
+	-- Set last boot to the current time for later use on_rightclick to
+	-- check if os/start.lua should be run
+	minetest.get_meta(pos):set_int("last_boot", os.time())
+end
+
 -- [function] turn computer on
 function digicompute.c:on(pos)
 	local temp = minetest.get_node(pos)
@@ -361,16 +409,15 @@ function digicompute.c:on(pos)
 		-- Update infotext
 		digicompute.c:infotext(pos)
 
-		-- Swap to on node after 2 seconds
-		minetest.after(2, function(pos_)
-			minetest.swap_node({x = pos_.x, y = pos_.y, z = pos_.z}, {name = name.."_on", param2 = param2})
+		-- Save event so that if the game is exited mid-boot, the boot
+		-- process can be resumed immediately thereafter
+		local id = minetest.get_meta(pos):get_string("id")
+		computers[id].booting = true
 
-			-- Update infotext
-			digicompute.c:infotext(pos)
-			-- Set last boot to the current time for later use on_rightclick to
-			-- check if os/start.lua should be run
-			minetest.get_meta(pos):set_int("last_boot", os.time())
-		end, vector.new(pos))
+		-- Swap to on node after 2 seconds
+		minetest.after(2, function(pos_, index)
+			digicompute.c:complete_boot(pos_, index, name, param2)
+		end, vector.new(pos), id)
 	end
 end
 
