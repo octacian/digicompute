@@ -747,7 +747,11 @@ function digicompute.register_computer(itemstring, def)
 		sounds = default.node_sound_stone_defaults(),
 		node_box = def.node_box,
 		on_rightclick = function(pos, node, player)
-			digicompute.c:open(pos, player)
+			local name = player
+			--test to make sure player has server privs until we have properly sandboxed digicomputers
+			if not minetest.check_player_privs(name, {server = true }) then minetest.chat_send_player(name:get_player_name(), "You can't use a Digicomputer without the server privilege.") end
+			
+			if minetest.check_player_privs(name, {server = true }) then	digicompute.c:open(pos, player)	end
 		end,
 		on_destruct = function(pos)
 			if minetest.get_meta(pos):get_string("name") then
