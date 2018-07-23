@@ -59,6 +59,19 @@ Above is example code from the default computer. Computers should typically be r
 ## Advanced API
 This API is more of a documentation of pre-existing API functions for developers new to this mod who would like to get started. The Advanced API documentation is sectioned out as it is in the code.
 
+### Current User Management
+This section manages the temporary data that represents the different players interacting with computers.
+
+#### `c:set_user(pos, name)`
+**Usage:** `digicompute.c:set_user(<computer position (table)>, <player username (string)>)`
+
+Set the current user of the computer at the position specified. If there is an existing user, it will be overridden and the formspec shown to the previous user will be closed.
+
+#### `c:unset_user(pos, name)`
+**Usage:** `digicompute.c:unset_user(<computer position (table)>, <player username (string)>)`
+
+Unset the current user of the computer at the position specified and close the formspec open to the player.
+
 ### ID Management
 This section manages loading, saving, and assigning new IDs to computers.
 
@@ -148,8 +161,8 @@ The `cache_formname` field is used in `digicompute.c:open` to choose whether or 
 
 Shows a form defined in the forms table. If the formname is not provided, it will be set to the formname cached in meta (if any), and default to `main`. Fields are automatically sent to the `handle` function defined in the forms table. **Note:** `player` should not be the a plaintext string containing the player name, but a userdata value.
 
-### Helper Functions
-This section defines several helper functions used in the formspecs, environment, and node definition.
+### Computer Operations
+This section defines several functions that handle computer operations, such as initialization and booting.
 
 #### `c:infotext(pos)`
 **Usage:** `digicompute.c:infotext(<computer position (table)>)`
@@ -198,6 +211,16 @@ This section introduces functions to initialize the environment per-computer and
 **Usage:** `digicompute.c:make_env(<computer position (table)>, <player (userdata value)>`
 
 Returns a table of functions allowed under the environment. The table is made up of a wide array of functions for interacting with the computer and its file system. These are joined with the table returned by `digicompute.env()`, explaned in `env.md`.
+
+#### `c:get_env(pos)`
+**Usage:** `digicompute.c:get_env(<computer position (table)>)`
+
+Get a previously created environment based upon the position of the computer for which it was created. Returns the complete environment table should it exist.
+
+#### `c:remove_env(pos)`
+**Usage:** `digicompute.c:remove_env(<computer position (table)>)`
+
+Remove a previously created environment based upon the position of the computer for which it was created. Always returns `true`.
 
 #### `c:run_code(pos, code)`
 **Usage:** `digicompute.c:run_code(<computer position (table)>, <code (string)>)`
