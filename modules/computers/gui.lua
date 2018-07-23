@@ -202,19 +202,26 @@ end
 -- [event] on receive fields
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 	formname = formname:split(":")
+	local name = player:get_player_name()
 
 	if formname[1] == "digicompute" and digicompute.c.forms[formname[2]] then
-		local computer = computers[computer_contexts[player:get_player_name()]]
+		local computer = computers[computer_contexts[name]]
 
 		if computer then
 			local pos = computer.pos
+			local meta = minetest.get_meta(pos)
 
 			-- if formspec quit, remove current user
 			if fields.quit == "true" then
-				digicompute.c:unset_user(pos, player:get_player_name())
+				digicompute.c:unset_user(pos, name)
 			end
 
-			digicompute.c.forms[formname[2]].handle(pos, player, fields)
+			-- if input is from the current user, process
+			if name == meta:get_string("current_user") then
+				digicompute.c.forms[formname[2]].handle(pos, player, fields)
+			elseif not fields.quit then -- elseif not already closed, close formspec
+				minetest.close_formspec(name, formname)
+			end
 		else
 			minetest.chat_send_player(player:get_player_name(), "Computer could not be found!")
 		end

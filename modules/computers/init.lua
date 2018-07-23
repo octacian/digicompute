@@ -29,17 +29,16 @@ function digicompute.c:set_user(pos, name)
 	local meta = minetest.get_meta(current_users[name])
 	local current_user = meta:get_string("current_user")
 	-- Check if there was already another user
-	if current_user ~= "" then
+	if current_user ~= "" and current_user ~= name then
 		if minetest.get_player_by_name(current_user) then
 			local formname = meta:get_string("formname")
 			-- if formname is defined, close that formspec
 			if formname ~= "" then
 				minetest.close_formspec(current_user, "digicompute:"..formname)
-			else -- else, just close everything
-				minetest.close_formspec(current_user)
 			end
 			-- Remove from current users
 			current_users[current_user] = nil
+			minetest.log("Removed current user: "..dump(current_user))
 		end
 	end
 	-- Update node meta entry
@@ -48,17 +47,17 @@ end
 
 -- [function] Unset current user
 function digicompute.c:unset_user(pos, name)
-	local meta = minetest.get_meta(current_users[name])
-	-- Clear node meta entry
-	meta:set_string("current_user", nil)
-	current_users[name] = nil -- Remove from table
+	if current_users[name] then
+		local meta = minetest.get_meta(current_users[name])
+		-- Clear node meta entry
+		meta:set_string("current_user", nil)
+		current_users[name] = nil -- Remove from table
 
-	local formname = meta:get_string("formname")
-	-- if formname is defined, close that formspec
-	if formname ~= "" then
-		minetest.close_formspec(name, "digicompute:"..formname)
-	else -- else, just close everything
-		minetest.close_formspec(name)
+		local formname = meta:get_string("formname")
+		-- if formname is defined, close that formspec
+		if formname ~= "" then
+			minetest.close_formspec(name, "digicompute:"..formname)
+		end
 	end
 end
 
