@@ -11,7 +11,7 @@ local bin = {}
 local bin_contents = fs.list("os/bin")
 for _,f in ipairs(bin_contents.files) do
 	local fpath    = "os/bin/"..f
-	local cmd_info = Settings(fpath):to_table()
+	local cmd_info = fs.read_settings(fpath):to_table()
 	local name     = cmd_info.name or f
 
 	bin[name] = {

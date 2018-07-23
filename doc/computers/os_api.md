@@ -86,11 +86,6 @@ __Usage:__ `set_run(<file path (string)>)`
 
 Set the file that is to be run when text in the input bar is submitted. Defaults to `os/main.lua`. If the `path` parameter is not provided, the run file will be reset to the default.
 
-#### `Settings(path)`
-__Usage:__ `Settings(<path (string)>)`
-
-Returns a userdata value containing a list of the "settings" defined in a file. Each setting should be on a new line, like variables but without `local` as a prefix. This "object" has several methods that you can use on it (e.g. `:to_table()`), however they are not documented here. Instead, see the methods section in the [documentation for node meta](http://dev.minetest.net/NodeMetaRef#Methods) as `Settings()` and node meta share the same methods.
-
 ## Filesystem
 This API section introduces function to interact with the computer's physical filesystem.
 
@@ -148,3 +143,8 @@ Recursively copies a directory and all it's sub-directories and files. Returns `
 __Usage:__ `fs.run(<path to file (string)>, <additional paramters>)`
 
 Attempts to read the contents of a file, treating it as Lua code to be run under the environment. Returns two parameters, the first representing success and the second being `nil` unless the operation was not successful, in which case it contains an error message. Any number of additional parameters can be provided after the path, to be accessed by the code being run.
+
+#### `read_settings(path)`
+__Usage:__ `fs.read_settings(<path (string)>)`
+
+Returns a userdata value containing a list of the "settings" defined in a file. Each setting should be on a new line, like variables but without `local` as a prefix. This "object" has several methods that you can use on it (e.g. `:to_table()`), however they are not documented here. Instead, see the methods section in the [documentation for node meta](http://dev.minetest.net/NodeMetaRef#Methods) as `Settings()` and node meta share the same methods.
