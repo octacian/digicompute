@@ -1,8 +1,8 @@
 -- Set OS values
-set_os("clear", "clear")
-set_os("off", "shutdown")
-set_os("reboot", "shutdown -r")
-set_os("prefix", get_attr("name")..":~$ ")
+system.clear = "clear"
+system.off = "shutdown"
+system.reboot = "shutdown -r"
+system.prefix = get_attr("name")..":~$ "
 
 -- Initialize bin table
 local bin = {}
@@ -22,15 +22,15 @@ for _,f in ipairs(bin_contents.files) do
 end
 
 -- Add additional commands to bin
-bin[get_os("clear")] = { description = "Clear the shell output" } -- Clear shell output
-bin[get_os("off")] = { description = "Turn off computer" } -- Turn off computer
-bin[get_os("reboot")] = { description = "Reboot computer" } -- Reboot computer
+bin[system.clear] = { description = "Clear the shell output" } -- Clear shell output
+bin[system.off] = { description = "Turn off computer" } -- Turn off computer
+bin[system.reboot] = { description = "Reboot computer" } -- Reboot computer
 
 -- Save bin table
 ram.bin = bin
 
 -- Set initial output value
-set_output("Welcome to octOS version 0.2.\n\n"..get_os("prefix")) -- print welcome
+set_output("Welcome to octOS version 0.2.\n\n"..system.prefix) -- print welcome
 
 -- Refresh view
 refresh()

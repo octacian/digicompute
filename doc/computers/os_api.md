@@ -5,6 +5,21 @@ OctOS is the operating system used by digicomputers. OctOS is made of many Linux
 
 In earlier versions of digicompute, a RAM-like storage mechanism could be accessed with a `get_userdata` and `set_userdata` API. However, this API was later removed and instead the RAM is accessed by setting values of the `ram` table within the environment. Data can also be preserved by setting a global variable within the environment, however, use of the `ram` table is recommended. This is because of how digicompute handles the environments in the background. Global variables, including the `ram` table, are stored within the environment itself, and with the environment being preserved until the computer is shut off or deinitialized, the variables are preserved as well. Please note that digicompute does not currently have a completely accurate representation of RAM, in that there is no limitation to the amount of data that can be stored. **Warning:** Functions and userdata cannot be stored within RAM.
 
+## Accessing the System Information
+
+Earlier versions of digicompute had an array of functions to get and set arbitrary customizable data regarding the system. This data includes the prefix, clear command, input buffer, and more. However, these APIs have been replaced with a single `system` table, available globally and saved with the help of metatables. There are a very limited amount of keys that can be written to in the system table, as documented below.
+
+**Valid Keys:**
+* `clear` - `string`: command to clear the output and input.
+* `off` - `string`: command to turn the computer off.
+* `reboot` - `string`: command to reboot the computer.
+* `prefix` - `string`: prefix printed at the beginning of a new line.
+
+**Example:**
+```lua
+system.reboot = "shutdown -r"
+```
+
 ## Main
 This contains a set of functions mainly for the purpose of interacting with the computer's displays.
 
@@ -60,21 +75,6 @@ Returns the value of the input field. Shorthand for `get_attr("input")`.
 **Usage:** `set_input(<value (string)>)`
 
 Set the input field to any string. This is the write method for the input attribute.
-
-#### `get_os(key)`
-**Usage:** `get_os(<data name (string)>)`
-
-Gets a piece of information from the OS table. See next function for further information on this table.
-
-#### `set_os(key, value)`
-**Usage:** `set_os(<data name (string)>, <value>`
-
-Sets a piece of information stored in the OS table. This table stores basic values containing information global to the operating system. However, it is quite limitted, only being capable of storing a few pieces of information as listed below.
-
-* `clear`: command to clear the output and input.
-* `off`: command to turn the computer off.
-* `reboot`: command to reboot the computer.
-* `prefix`: prefix printed at the beginning of a new line.
 
 #### `refresh()`
 **Usage:** `refresh()`

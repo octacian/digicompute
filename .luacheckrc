@@ -7,7 +7,7 @@ globals = {
 	"digicompute",
 
 	-- OctOS Internals
-	"ram",
+	"ram", "system",
 }
 
 read_globals = {
@@ -24,6 +24,5 @@ read_globals = {
 	-- OctOS Internals (custom environment functions)
 	"set_help", "get_attr", "get_output", "set_output",
 	"set_output_editable", "get_input", "set_input",
-	"get_os", "set_os", "refresh", "run", "loadstring",
-	"set_run", "fs",
+	"refresh", "run", "loadstring", "set_run", "fs",
 }

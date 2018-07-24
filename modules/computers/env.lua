@@ -13,6 +13,7 @@ local function create_env_table(meta, pos)
 	local env = {
 		fs = {}, -- Filesystem API
 		ram = {}, -- RAM userdata table
+		system = {}, -- Limited system table
 	}
 
 	--- General Functions ---
@@ -80,29 +81,6 @@ local function create_env_table(meta, pos)
 		return meta:set_string("input", value)
 	end
 
-	-- [function] Get a value from the OS table
-	function env.get_os(key)
-		return minetest.deserialize(meta:get_string("os"))[key] or nil
-	end
-
-	-- [function] Set the value of one of the allowed keys in the OS table
-	function env.set_os(key, value)
-		local allowed_keys = {
-			clear = true,
-			off = true,
-			reboot = true,
-			prefix = true,
-		}
-
-		if allowed_keys[key] == true then
-			local table = minetest.deserialize(meta:get_string("os")) or {}
-			table[key] = value
-			return meta:set_string("os", minetest.serialize(table))
-		else
-			return false
-		end
-	end
-
 	-- [function] Refresh the computer formspec
 	function env.refresh()
 		local current_user = meta:get_string("current_user")
@@ -126,7 +104,7 @@ local function create_env_table(meta, pos)
 				meta:set_string("run", run_path)
 			end
 		else
-			meta:set_string("run", "os/env.lua")
+			meta:set_string("run", "os/main.lua")
 		end
 	end
 
@@ -223,6 +201,40 @@ local function create_env_table(meta, pos)
 		end,
 	}
 	setmetatable(env.ram, ram_mt)
+
+	local system_shadow = minetest.deserialize(meta:get_string("os"))
+	-- Define OS metatable
+	local system_mt = {
+		-- Ensure value is allowed and save to meta as well
+		__newindex = function(table, key, value)
+			local allowed_keys = {
+				clear = true,
+				off = true,
+				reboot = true,
+				prefix = true,
+			}
+
+			-- Ensure strings
+			if type(value) ~= "string" then
+				local msg = "Error: All values in the system table must be strings."
+				env.print(msg)
+				env.print_debug(msg)
+			elseif not allowed_keys[key] then
+				local msg = "Error: "..key.. " is not an allowed key in the system table."
+				env.print(msg)
+				env.print_debug(msg)
+			else -- else, save
+				rawset(system_shadow, key, value) -- Save to table
+				-- Save to metadata
+				meta:set_string("system", minetest.serialize(system_shadow))
+			end
+		end,
+		-- Always fetch values from the shadow table
+		__index = function(table, key)
+			return system_shadow[key]
+		end,
+	}
+	setmetatable(env.system, system_mt)
 
 	return env -- Return custom env functions
 end

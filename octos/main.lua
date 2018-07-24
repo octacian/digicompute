@@ -19,7 +19,7 @@ if input[1] ~= "" then
 		print(input[1]..": command not found")
 	end
 
-	print(get_os("prefix"))
+	print(system.prefix)
 
 	-- Clear input
 	set_input("")
