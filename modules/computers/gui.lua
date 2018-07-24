@@ -74,6 +74,7 @@ digicompute.c.forms = {
 				"size[6,1.7]"..
 				default.gui_bg_img..
 				"field[.25,0.50;6,1;name;Computer Name:;"..minetest.formspec_escape(meta:get_string("name")).."]"..
+				"field_close_on_enter[name;false]"..
 				"button[4.95,1;1,1;submit_name;Set]"
 		end,
 		handle = function(pos, player, fields)
