@@ -32,6 +32,11 @@ local function create_env_table(meta, pos)
 			contents)
 	end
 
+	-- [function] Print to the computer debug buffer
+	function env.print_debug(msg)
+		return digicompute.c:print_debug(pos, msg)
+	end
+
 	-- [function] Set help text shown when hovering over question mark button
 	function env.set_help(value)
 		if not value or type(value) ~= "string" then
@@ -238,6 +243,8 @@ end
 function digicompute.c:run_code(pos, code, ...)
 	local env     = digicompute.c:make_env(pos)
 	local ok, res = digicompute.run_code(code, env, ...)
+	digicompute.c:print_debug(pos, "Run Code, Success: "..dump(ok)..
+		", Message: "..dump(res))
 	return ok, res
 end
 
@@ -246,5 +253,7 @@ function digicompute.c:run_file(pos, internal_path, ...)
 	local complete_path = minetest.get_meta(pos):get_string("path")..internal_path
 	local env           = digicompute.c:make_env(pos)
 	local ok, res       = digicompute.run_file(complete_path, env, ...)
+	digicompute.c:print_debug(pos, "Run File ("..internal_path.."), Success: "..
+		dump(ok)..", Message: "..dump(res))
 	return ok, res
 end

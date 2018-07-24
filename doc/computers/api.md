@@ -169,6 +169,11 @@ This section defines several functions that handle computer operations, such as 
 
 Updates the infotext of the computer. This is called after the computer is named or when its state changes (off/bios/on).
 
+#### `c:print_debug(pos, msg)`
+**Usage:** `digicompute.c:print_debug(<computer position (table)>, <message (*)>)`
+
+Prints a message to the debug buffer of the computer. If contents is not a string, it will be converted to a string with `dump`.
+
 #### `c:init(pos)`
 **Usage:** `digicompute.c:init(<computer position (table)>)`
 

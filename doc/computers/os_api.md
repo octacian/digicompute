@@ -13,6 +13,11 @@ This contains a set of functions mainly for the purpose of interacting with the 
 
 Prints to the output buffer. If contents is not a string, it will be converted to a string with `dump`. The second parameter, if false, prevents print from inserting a newline before printing the provided contents.
 
+#### `print_debug(msg)`
+**Usage:** `print_debug(<message (*)>)`
+
+Prints a message to the debug buffer in the Debug Console tab. If contents is not a string, it will be converted to a string with `dump`.
+
 #### `set_help(value)`
 **Usage:** `set_help(<value (string)>)`
 

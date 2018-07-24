@@ -13,6 +13,7 @@ local computer_contexts = {}
 
 local tabs = {
 	"main",
+	"debug",
 	"settings",
 }
 
@@ -90,7 +91,7 @@ digicompute.c.forms = {
 
 			return
 				"size[10,11]"..
-				"tabheader[0,0;tabs;Command Line,Settings;1]"..
+				"tabheader[0,0;tabs;Command Line,Debug Console,Settings;1]"..
 				"bgcolor[#000000FF;]"..
 				output..
 				"button[9.56,10.22;0.8,2;help;?]"..
@@ -127,11 +128,42 @@ digicompute.c.forms = {
 			end
 		end,
 	},
+	debug = {
+		get = function(pos)
+			local meta = minetest.get_meta(pos)
+			local debug = minetest.deserialize(meta:get_string("debug"))
+			local length = 0
+			-- Escape lines
+			for _, l in pairs(debug) do
+				debug[_] = minetest.formspec_escape(l)
+				length = length + 1
+			end
+			-- Concatenate
+			debug = table.concat(debug, ",")
+
+			return
+				"size[10,11]"..
+				"tabheader[0,0;tabs;Command Line,Debug Console,Settings;2]"..
+				default.gui_bg_img..
+				"tableoptions[background=#000000FF;highlight=#00000000;border=false]"..
+				"table[-0.25,-0.38;10.38,11.17;debug;"..debug..";"..length.."]"..
+				"button[-0.28,10.22;10.6,2;clear;Clear Debug Console]"
+		end,
+		handle = function(pos, player, fields)
+			if digicompute.c:handle_tabs(pos, player, fields) then return end
+
+			if fields.clear then
+				local meta = minetest.get_meta(pos)
+				meta:set_string("debug", minetest.serialize({})) -- Clear debug buffer
+				digicompute.c:open(pos, player) -- Refresh formspec
+			end
+		end,
+	},
 	settings = {
 		get = function(pos)
 			return
 				"size[10,11]"..
-				"tabheader[0,0;tabs;Command Line,Settings;2]"..
+				"tabheader[0,0;tabs;Command Line,Debug Console,Settings;3]"..
 				default.gui_bg_img..
 				"button[0.5,0.25;9,1;reset;Reset Filesystem]"..
 				"tooltip[reset;Wipes all files and OS data replacing it with the basic octOS.]"..

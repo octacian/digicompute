@@ -57,6 +57,16 @@ function digicompute.c:infotext(pos)
 	end
 end
 
+-- [function] print to computer debug buffer
+function digicompute.c:print_debug(pos, msg)
+	if type(msg) ~= "string" then msg = dump(msg) end
+	local meta = minetest.get_meta(pos)
+	local debug = minetest.deserialize(meta:get_string("debug"))
+	table.insert(debug, os.date("[%d/%m/%Y @ %H:%M] ")..msg)
+	meta:set_string("debug", minetest.serialize(debug))
+	return true
+end
+
 -- [function] initialize computer
 function digicompute.c:init(pos)
 	local meta = minetest.get_meta(pos)
@@ -69,6 +79,7 @@ function digicompute.c:init(pos)
 		digicompute.log("Initialized computer "..meta:get_string("id").." owned by "..
 			meta:get_string("owner").." at "..minetest.pos_to_string(pos))
 		digicompute.c:infotext(pos)
+		digicompute.c:print_debug(pos, "Initialized")
 	end
 end
 
@@ -83,9 +94,9 @@ function digicompute.c:deinit(pos, clear_entry)
 		digicompute.log("Deinitialized computer "..meta:get_string("id").." owned by "..
 			meta:get_string("owner").." at "..minetest.pos_to_string(pos))
 
-			if digicompute.builtin.list(main_path..owner).subdirs then
-				digicompute.builtin.rmdir(main_path..owner)
-			end
+		if digicompute.builtin.list(main_path..owner).subdirs then
+			digicompute.builtin.rmdir(main_path..owner)
+		end
 	end
 
 	local id = meta:get_string("id")
@@ -115,6 +126,8 @@ function digicompute.c:complete_boot(pos, index, name, param2)
 	-- Set last boot to the current time for later use on_rightclick to
 	-- check if os/start.lua should be run
 	minetest.get_meta(pos):set_int("last_boot", os.time())
+	-- Log boot in debug buffer
+	digicompute.c:print_debug(pos, "Booted")
 end
 
 -- [function] turn computer on
@@ -155,6 +168,8 @@ function digicompute.c:off(pos, player)
 	if player and player.get_player_name then
 		minetest.close_formspec(player:get_player_name(), "")
 	end
+	-- Log action in debug buffer
+	digicompute.c:print_debug(pos, "Shut down")
 	-- Clear output buffer
 	meta:set_string("output", "")
 	-- Reset environment
@@ -192,6 +207,7 @@ function digicompute.register_computer(itemstring, def)
 			meta:set_string("owner", player:get_player_name())
 			meta:set_string("input", "")                               -- Initialize input buffer
 			meta:set_string("output", "")                              -- Initialize output buffer
+			meta:set_string("debug", minetest.serialize({}))           -- Initialize debug buffer
 			meta:set_string("os", "")                                  -- Initialize OS table
 			meta:set_string("help", "Type a command and press enter.") -- Initialize help
 			meta:set_string("output_editable", "false")                -- Initialize uneditable output
