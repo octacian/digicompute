@@ -198,6 +198,32 @@ local function create_env_table(meta, pos)
 		end
 	end
 
+	--- Metatables ---
+
+	local ram_shadow = minetest.deserialize(meta:get_string("ram"))
+	-- Define RAM metatable
+	local ram_mt = {
+		-- Save to meta as well as to shadow table
+		__newindex = function(table, key, value)
+			local vtype = type(value)
+			-- Prevent saving functions and userdata
+			if vtype == "function" or vtype == "userdata" then
+				local msg = "Error: Functions and userdata cannot be stored in the RAM."
+				env.print(msg)
+				env.print_debug(msg)
+			else -- else, save
+				rawset(ram_shadow, key, value) -- Save to table
+				-- Save to metadata
+				meta:set_string("ram", minetest.serialize(ram_shadow))
+			end
+		end,
+		-- Always fetch values from the shadow table
+		__index = function(table, key)
+			return ram_shadow[key]
+		end,
+	}
+	setmetatable(env.ram, ram_mt)
+
 	return env -- Return custom env functions
 end
 

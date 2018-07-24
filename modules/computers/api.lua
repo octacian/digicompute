@@ -172,6 +172,8 @@ function digicompute.c:off(pos, player)
 	digicompute.c:print_debug(pos, "Shut down")
 	-- Clear output buffer
 	meta:set_string("output", "")
+	-- Clear RAM
+	meta:set_string("ram", minetest.serialize({}))
 	-- Reset environment
 	digicompute.c:remove_env(pos)
 end
@@ -209,6 +211,7 @@ function digicompute.register_computer(itemstring, def)
 			meta:set_string("output", "")                              -- Initialize output buffer
 			meta:set_string("debug", minetest.serialize({}))           -- Initialize debug buffer
 			meta:set_string("os", "")                                  -- Initialize OS table
+			meta:set_string("ram", minetest.serialize({}))             -- Initialize RAM preservation table
 			meta:set_string("help", "Type a command and press enter.") -- Initialize help
 			meta:set_string("output_editable", "false")                -- Initialize uneditable output
 			meta:set_int("wrap_limit", 90)                             -- Initialize wrap chracter limit
