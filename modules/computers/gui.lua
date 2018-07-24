@@ -5,6 +5,44 @@ local main_path = path.."computers/"
 
 local computers = digicompute.loaded_computers
 
+-- [local function] Wrap text inserting a comma after a line exceeds the limit
+local function prepare_text(str, limit)
+	if type(str) == "string" then
+		local res = ""
+		local newline = false
+		local line_length = 0
+		for c in str:gmatch(".") do
+			-- if newline is true, wait for a space or 10 extra characters to insert a newline
+			if newline then
+				if c == " " or (line_length - limit) > 10 then
+					res = res .. ","
+					newline = false
+					line_length = 0
+				else
+					res = res .. c
+					line_length = line_length + 1
+				end
+			-- elseif character is an unescaped break, reset line length
+			elseif c == "," and res:sub(-1) ~= "\\" then
+				line_length = 0
+				newline = false
+				res = res .. c
+			-- else, increment line length
+			else
+				line_length = line_length + 1
+				-- if line is too long, set to break at next space
+				if line_length > limit then
+					newline = true
+				end
+
+				res = res .. c
+			end
+		end
+
+		return res
+	end
+end
+
 -------------------
 ---- FORMSPECS ----
 -------------------
@@ -84,9 +122,10 @@ digicompute.c.forms = {
 				for i, line in ipairs(output) do
 					output[i] = minetest.formspec_escape(line)
 				end
+				output = prepare_text(table.concat(output, ","), meta:get_int("wrap_limit"))
 				output =
 					"tableoptions[background=#000000FF;highlight=#00000000;border=false]"..
-					"table[-0.25,-0.38;10.38,11.17;list_credits;"..table.concat(output, ",")..";"..#output.."]"
+					"table[-0.25,-0.38;10.38,11.17;list_credits;"..output..";"..#output.."]"
 			end
 
 			return
@@ -138,8 +177,8 @@ digicompute.c.forms = {
 				debug[_] = minetest.formspec_escape(l)
 				length = length + 1
 			end
-			-- Concatenate
-			debug = table.concat(debug, ",")
+			-- Concatenate and wrap
+			debug = prepare_text(table.concat(debug, ","), meta:get_int("wrap_limit"))
 
 			return
 				"size[10,11]"..
@@ -161,12 +200,25 @@ digicompute.c.forms = {
 	},
 	settings = {
 		get = function(pos)
+			local meta = minetest.get_meta(pos)
+			local limit = tostring(meta:get_int("wrap_limit"))
+			local wrap_msg = "Wrap text after (default: 90; min: 10):"
+			wrap_msg = minetest.formspec_escape(wrap_msg)
+
 			return
 				"size[10,11]"..
 				"tabheader[0,0;tabs;Command Line,Debug Console,Settings;3]"..
 				default.gui_bg_img..
 				"button[0.5,0.25;9,1;reset;Reset Filesystem]"..
 				"tooltip[reset;Wipes all files and OS data replacing it with the basic octOS.]"..
+				"field[0.8,1.7;7,1;wrap_limit;"..wrap_msg..";"..limit.."]"..
+				"field_close_on_enter[wrap_limit;false]"..
+				"tooltip[wrap_limit;Number of characters after which to wrap text.]"..
+				"button[7.5,1.4;1,1;wrap_save;Save]"..
+				"tooltip[wrap_save;Save wrap limit]"..
+				"button[8.5,1.4;1,1;wrap_reset;Reset]"..
+				"tooltip[wrap_reset;Reset wrap limit to default]"..
+
 				"label[0.5,10.35;digicompute Version: "..tostring(digicompute.VERSION)..", "..
 					digicompute.RELEASE_TYPE.."]"..
 				"label[0.5,10.75;(c) Copywrite "..tostring(os.date("%Y")).." "..
@@ -188,6 +240,22 @@ digicompute.c.forms = {
 				-- Rerun start.lua
 				meta:set_int("last_run_start", os.time())
 				digicompute.c:run_file(pos, "os/start.lua")
+			elseif fields.key_enter_field == "wrap_limit" or fields.wrap_save then
+				if fields.wrap_limit == "" then
+					digicompute.c:open(pos, player)
+				else
+					local new_limit = tonumber(fields.wrap_limit)
+					if new_limit and new_limit >= 10 then
+						meta:set_int("wrap_limit", new_limit)
+						digicompute.c:print_debug(pos, "Set wrap limit to "..new_limit)
+					else
+						digicompute.c:open(pos, player)
+					end
+				end
+			elseif fields.wrap_reset then
+				meta:set_int("wrap_limit", 90)
+				digicompute.c:print_debug(pos, "Reset wrap limit to 90")
+				digicompute.c:open(pos, player)
 			end
 		end,
 	},

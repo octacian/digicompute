@@ -211,6 +211,7 @@ function digicompute.register_computer(itemstring, def)
 			meta:set_string("os", "")                                  -- Initialize OS table
 			meta:set_string("help", "Type a command and press enter.") -- Initialize help
 			meta:set_string("output_editable", "false")                -- Initialize uneditable output
+			meta:set_int("wrap_limit", 90)                             -- Initialize wrap chracter limit
 			digicompute.c:new_id(pos)                                  -- Set up ID
 
 			-- Update infotext
