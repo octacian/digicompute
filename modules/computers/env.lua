@@ -16,6 +16,30 @@ local function create_env_table(meta, pos)
 		system = {}, -- Limited system table
 	}
 
+	--- System Functions ---
+
+	-- [function] Turn computer off
+	function env.system.shutdown()
+		local current_user = meta:get_string("current_user")
+		if current_user ~= "" then
+			local player = minetest.get_player_by_name(current_user)
+			if player then
+				return digicompute.c:off(pos, player)
+			end
+		end
+	end
+
+	-- [function] Reboot computer
+	function env.system.reboot()
+		local current_user = meta:get_string("current_user")
+		if current_user ~= "" then
+			local player = minetest.get_player_by_name(current_user)
+			if player then
+				return digicompute.c:reboot(pos, player)
+			end
+		end
+	end
+
 	--- General Functions ---
 
 	-- [function] Print to computer console
@@ -179,9 +203,6 @@ local function create_env_table(meta, pos)
 		-- Ensure value is allowed and save to meta as well
 		__newindex = function(table, key, value)
 			local allowed_keys = {
-				clear = "string",
-				off = "string",
-				reboot = "string",
 				prefix = "string",
 				input = "string",
 				output = "string",

@@ -1,7 +1,4 @@
 -- Set OS values
-system.clear = "clear"
-system.off = "shutdown"
-system.reboot = "shutdown -r"
 system.prefix = get_attr("name")..":~$ "
 
 -- Initialize bin table
@@ -22,9 +19,9 @@ for _,f in ipairs(bin_contents.files) do
 end
 
 -- Add additional commands to bin
-bin[system.clear] = { description = "Clear the shell output" } -- Clear shell output
-bin[system.off] = { description = "Turn off computer" } -- Turn off computer
-bin[system.reboot] = { description = "Reboot computer" } -- Reboot computer
+--bin[system.clear] = { description = "Clear the shell output" } -- Clear shell output
+--bin[system.off] = { description = "Turn off computer" } -- Turn off computer
+--bin[system.reboot] = { description = "Reboot computer" } -- Reboot computer
 
 -- Save bin table
 ram.bin = bin

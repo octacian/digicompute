@@ -1,0 +1,4 @@
+name = shutdown
+description = Turn off or reboot computer
+params = [-r]
+exec = os/exec/shutdown.lua

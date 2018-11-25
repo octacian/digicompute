@@ -19,7 +19,12 @@ if input[1] ~= "" then
 		print(input[1]..": command not found")
 	end
 
-	print(system.prefix)
+	if ram.newline_before_prefix ~= false then
+		print(system.prefix)
+	else
+		ram.newline_before_prefix = nil
+		print(system.prefix, false)
+	end
 
 	-- Clear input
 	system.input = ""

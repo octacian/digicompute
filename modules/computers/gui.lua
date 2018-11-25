@@ -143,28 +143,19 @@ digicompute.c.forms = {
 			if digicompute.c:handle_tabs(pos, player, fields) then return end
 
 			local meta   = minetest.get_meta(pos) -- get meta
-			local os     = minetest.deserialize(meta:get_string("os")) or {}
-			local prefix = os.prefix or ""
 
+			-- Hand values over to operating system
 			if fields.input or fields.key_enter_field == "name" then
-				if fields.input == os.clear then
-					meta:set_string("output", prefix)
-					meta:set_string("input", "")
-					digicompute.c:open(pos, player)
-				elseif fields.input == os.off then digicompute.c:off(pos, player)
-				elseif fields.input == os.reboot then digicompute.c:reboot(pos, player)
-				else -- else, turn over to os
-					-- Set meta value(s)
-					meta:set_string("input", fields.input)
-					if fields.output then
-						meta:set_string("output", fields.output)
-					end
-
-					local run = meta:get_string("run")
-					if run == "" then run = "os/main.lua" end
-					-- Get and run current "run file" (default: os/main.lua)
-					digicompute.c:run_file(pos, run)
+				-- Set meta value(s)
+				meta:set_string("input", fields.input)
+				if fields.output then
+					meta:set_string("output", fields.output)
 				end
+
+				local run = meta:get_string("run")
+				if run == "" then run = "os/main.lua" end
+				-- Get and run current "run file" (default: os/main.lua)
+				digicompute.c:run_file(pos, run)
 			end
 		end,
 	},

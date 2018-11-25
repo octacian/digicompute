@@ -10,9 +10,6 @@ In earlier versions of digicompute, a RAM-like storage mechanism could be access
 Earlier versions of digicompute had an array of functions to get and set arbitrary customizable data regarding the system. This data includes the prefix, clear command, input buffer, and more. However, these APIs have been replaced with a single `system` table, available globally and saved with the help of metatables. There are a very limited amount of keys that can be written to in the system table, as documented below.
 
 **Valid Keys:**
-* `clear` - `string`: command to clear the output and input.
-* `off` - `string`: command to turn the computer off.
-* `reboot` - `string`: command to reboot the computer.
 * `prefix` - `string`: prefix printed at the beginning of a new line.
 * `input` - `string`: contents of the input field.
 * `output` - `string`: contents of the output buffer.
@@ -20,8 +17,22 @@ Earlier versions of digicompute had an array of functions to get and set arbitra
 
 **Example:**
 ```lua
-system.reboot = "shutdown -r"
+system.prefix = get_attr("name")..":~$ "
 ```
+
+## System API
+
+The system API is part of the `system` table and is used to control low-level aspects of a computer.
+
+#### `shutdown()`
+**Usage:** `system.shutdown()`
+
+Turns the computer off and closes the formspec.
+
+#### `reboot()`
+**Usage:** `system.reboot()`
+
+Reboots the computer and closes the formspec.
 
 ## Main
 This contains a set of functions mainly for the purpose of interacting with the computer's displays.

@@ -1,0 +1,3 @@
+name = clear
+description = Clear console output
+exec = os/exec/clear.lua
