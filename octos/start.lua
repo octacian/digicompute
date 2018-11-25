@@ -30,7 +30,7 @@ bin[system.reboot] = { description = "Reboot computer" } -- Reboot computer
 ram.bin = bin
 
 -- Set initial output value
-set_output("Welcome to octOS version 0.2.\n\n"..system.prefix) -- print welcome
+system.output = "Welcome to octOS version 0.2.\n\n"..system.prefix -- print welcome
 
 -- Refresh view
 refresh()

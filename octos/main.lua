@@ -22,7 +22,7 @@ if input[1] ~= "" then
 	print(system.prefix)
 
 	-- Clear input
-	set_input("")
+	system.input = ""
 
 	-- Refresh view
 	refresh()

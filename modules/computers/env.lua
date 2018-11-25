@@ -52,35 +52,6 @@ local function create_env_table(meta, pos)
 		return meta:to_table().fields[key] or nil
 	end
 
-	-- [function] Get the value of the output formspec field
-	function env.get_output()
-		return meta:get_string("output") or nil
-	end
-
-	-- [function] Set the value of the output formspec field
-	function env.set_output(value)
-		return meta:set_string("output", value)
-	end
-
-	-- [function] Toggle whether the output area can be edited
-	function env.set_output_editable(bool)
-		if bool == true then
-			meta:set_string("output_editable", "true")
-		else
-			meta:set_string("output_editable", "false")
-		end
-	end
-
-	-- [function] Get the value of the input formspec field
-	function env.get_input()
-		return meta:get_string("input") or nil
-	end
-
-	-- [function] Set the value of the input formspec field
-	function env.set_input(value)
-		return meta:set_string("input", value)
-	end
-
 	-- [function] Refresh the computer formspec
 	function env.refresh()
 		local current_user = meta:get_string("current_user")
@@ -202,37 +173,50 @@ local function create_env_table(meta, pos)
 	}
 	setmetatable(env.ram, ram_mt)
 
-	local system_shadow = minetest.deserialize(meta:get_string("os"))
+	local system_shadow = minetest.deserialize(meta:get_string("system"))
 	-- Define OS metatable
 	local system_mt = {
 		-- Ensure value is allowed and save to meta as well
 		__newindex = function(table, key, value)
 			local allowed_keys = {
-				clear = true,
-				off = true,
-				reboot = true,
-				prefix = true,
+				clear = "string",
+				off = "string",
+				reboot = "string",
+				prefix = "string",
+				input = "string",
+				output = "string",
+				output_editable = "boolean",
 			}
 
-			-- Ensure strings
-			if type(value) ~= "string" then
-				local msg = "Error: All values in the system table must be strings."
-				env.print(msg)
-				env.print_debug(msg)
-			elseif not allowed_keys[key] then
+			-- Ensure allowed
+			if not allowed_keys[key] then
 				local msg = "Error: "..key.. " is not an allowed key in the system table."
 				env.print(msg)
 				env.print_debug(msg)
+			-- Ensure type
+			elseif type(value) ~= allowed_keys[key] then
+				local msg = "Error: "..key.." must be a "..allowed_keys[key]
+				env.print(msg)
+				env.print_debug(msg)
 			else -- else, save
-				rawset(system_shadow, key, value) -- Save to table
-				-- Save to metadata
-				meta:set_string("system", minetest.serialize(system_shadow))
+				-- Set input, output, and output editable separately
+				if key == "input" or key == "output" or key == "output_editable" then
+					rawset(system_shadow, key, value) -- Save to table
+
+					local t = allowed_keys[key]
+					-- if type is boolean, convert to string
+					if t == "boolean" then t = "string" end
+					-- Save separately to metadata
+					meta["set_"..t](meta, key, _G["to"..t](value))
+				else
+					rawset(system_shadow, key, value) -- Save to table
+					-- Save to metadata
+					meta:set_string("system", minetest.serialize(system_shadow))
+				end
 			end
 		end,
 		-- Always fetch values from the shadow table
-		__index = function(table, key)
-			return system_shadow[key]
-		end,
+		__index = system_shadow,
 	}
 	setmetatable(env.system, system_mt)
 

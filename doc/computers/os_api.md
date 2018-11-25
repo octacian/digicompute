@@ -14,6 +14,9 @@ Earlier versions of digicompute had an array of functions to get and set arbitra
 * `off` - `string`: command to turn the computer off.
 * `reboot` - `string`: command to reboot the computer.
 * `prefix` - `string`: prefix printed at the beginning of a new line.
+* `input` - `string`: contents of the input field.
+* `output` - `string`: contents of the output buffer.
+* `output_editable` - `boolean`: whether or not the output is editable.
 
 **Example:**
 ```lua
@@ -50,31 +53,6 @@ Gets a piece of global information from the node meta (storage). Several common 
 * `help`: formspec help text.
 * `id`: computer id.
 * `output_editable`: whether the output buffer is editable.
-
-#### `get_output()`
-**Usage:** `get_output()`
-
-Returns the value of the output buffer. Shorthand for `get_attr("output")`.
-
-#### `set_output(value)`
-**Usage:** `set_output(<value (string)>)`
-
-Set the output buffer to any string. This is the write method for the output attribute.
-
-#### `set_output_editable(bool)`
-**Usage:** `set_output_editable(<true/false (bool)>)`
-
-Makes the output buffer editable. Useful for programs that would like a larger input field. However, it can be used in any way wanted as `get_output` and `set_output` are still functional.
-
-#### `get_input()`
-**Usage:** `get_input()`
-
-Returns the value of the input field. Shorthand for `get_attr("input")`.
-
-#### `set_input(value)`
-**Usage:** `set_input(<value (string)>)`
-
-Set the input field to any string. This is the write method for the input attribute.
 
 #### `refresh()`
 **Usage:** `refresh()`

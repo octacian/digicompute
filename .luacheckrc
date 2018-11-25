@@ -22,7 +22,6 @@ read_globals = {
 	"default", "sfinv", "creative",
 
 	-- OctOS Internals (custom environment functions)
-	"set_help", "get_attr", "get_output", "set_output",
-	"set_output_editable", "get_input", "set_input",
-	"refresh", "run", "loadstring", "set_run", "fs",
+	"set_help", "get_attr",	"refresh", "run",
+	"loadstring", "set_run", "fs",
 }
